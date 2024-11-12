@@ -10,6 +10,7 @@
         function createRoomData() {
             return {
                 url: '[[${page?.data?.login?.url}]]',
+                roomsQuotaError: '[[${page?.data?.roomsQuotaError}]]',
                 timeoutError: '[[${page?.data?.timeoutError}]]',
                 operationError: '[[${page?.data?.operationError}]]',
                 monday: null,
@@ -87,8 +88,27 @@
 
                                     const roomResult = results[2];
                                     const composeTag = String(`Monday-${context.data.boardId}`);
-                                    if (!roomResult?.value?.id)
-                                        throw new Error("Could not create a new room");
+                                    if (!roomResult?.value?.id) {
+                                        if (roomResult?.value?.status == 402) {
+                                            this.enable();
+                                            this.onAppReadyProcessed = false;
+                                            await mondaySdk().execute("notice", {
+                                                message: this.roomsQuotaError,
+                                                type: "error",
+                                                timeout: 10000,
+                                            });
+                                        } else {
+                                            this.enable();
+                                            this.onAppReadyProcessed = false;
+                                            await mondaySdk().execute("notice", {
+                                                message: this.operationError,
+                                                type: "error",
+                                                timeout: 10000,
+                                            });
+                                        }
+                                        return;
+                                    }
+
                                     const link = await docSpace.addTagsToRoom(roomResult.value.id, ["Monday", composeTag]);
                                     if (!link?.id)
                                         throw new Error("Could not create a new room");
@@ -104,25 +124,25 @@
                                     }).then(response => {
                                         location.reload();
                                     }).catch(async (error) => {
+                                        this.enable();
+                                        this.onAppReadyProcessed = false;
                                         await mondaySdk().execute("notice", {
                                             message: this.operationError,
                                             type: "error",
                                             timeout: 10000,
                                         });
-                                        console.log(error);
-                                        this.enable();
-                                        this.onAppReadyProcessed = false;
                                     });
                                 } catch (error) {
+                                    this.enable();
+                                    this.onAppReadyProcessed = false;
                                     await mondaySdk().execute("notice", {
                                         message: this.timeoutError,
                                         type: "error",
                                         timeout: 10000,
                                     });
-                                    console.log(error);
-                                    this.enable();
-                                    this.onAppReadyProcessed = false;
                                     return;
+                                } finally {
+                                    await DocSpace.SDK.frames['ds-frame'].destroyFrame();
                                 }
                             },
                         }

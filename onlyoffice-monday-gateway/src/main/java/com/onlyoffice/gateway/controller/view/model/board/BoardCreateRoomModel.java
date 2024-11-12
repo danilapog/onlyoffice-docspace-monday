@@ -11,6 +11,7 @@ import lombok.Setter;
 public class BoardCreateRoomModel {
   private LoginModel login;
   private BoardCreateRoomInformationModel creationInformation;
+  @Builder.Default private String roomsQuotaError = "You are out of rooms quota";
   @Builder.Default private String timeoutError = "Operation timed out";
   @Builder.Default private String operationError = "Could not perform current operation";
 
