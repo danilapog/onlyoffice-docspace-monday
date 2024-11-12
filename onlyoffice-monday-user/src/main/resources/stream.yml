@@ -1,0 +1,46 @@
+spring:
+  cloud:
+    function:
+      definition: registerUserConsumer;removeTenantUsersConsumer
+    stream:
+      bindings:
+        registerUserConsumer-in-0:
+          destination: asc.users
+          group: upsert.consumer
+          content-type: application/json
+          binder: rabbit
+          consumer:
+            concurrency: 3
+            maxAttempts: 5
+            defaultRetryable: true
+            backOffInitialInterval: 2000
+            backOffMultiplier: 2.0
+        removeTenantUsersConsumer-in-0:
+          destination: asc.users
+          group: delete.batch.consumer
+          content-type: application/json
+          binder: rabbit
+          consumer:
+            concurrency: 1
+            maxAttempts: 3
+            defaultRetryable: true
+            backOffInitialInterval: 2000
+            backOffMultiplier: 2.0
+      rabbit:
+        bindings:
+          registerUserConsumer-in-0:
+            consumer:
+              bindingRoutingKey: upsert.user
+              autoBindDlq: true
+              deadLetterQueueName: asc.users.upsert.dlq
+              deadLetterExchange: asc.users.dlx
+              deadLetterExchangeType: topic
+              dlqTtl: 600000
+          removeTenantUsersConsumer-in-0:
+            consumer:
+              bindingRoutingKey: delete.users
+              autoBindDlq: true
+              deadLetterQueueName: asc.users.delete.dlq
+              deadLetterExchange: asc.users.dlx
+              deadLetterExchangeType: topic
+              dlqTtl: 600000

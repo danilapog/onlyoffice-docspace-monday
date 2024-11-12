@@ -1,0 +1,8 @@
+<template x-component="docspace-login-form">
+    <x-docspace-common-form>
+    </x-docspace-common-form>
+    <x-loader-button
+        th:data-text="${page?.data?.settingsForm?.loginText} ?: 'Login'"
+        type="submit"
+    ></x-loader-button>
+</template>

@@ -1,0 +1,41 @@
+apiVersion: skaffold/v4beta11
+kind: Config
+metadata:
+  name: onlyoffice-monday
+build:
+  artifacts:
+    - image: onlyoffice-monday-user
+      context: onlyoffice-monday-user
+      docker:
+        dockerfile: onlyoffice-monday-user/Dockerfile
+    - image: onlyoffice-monday-tenant
+      context: onlyoffice-monday-tenant
+      docker:
+        dockerfile: onlyoffice-monday-tenant/Dockerfile
+    - image: onlyoffice-monday-notification
+      context: onlyoffice-monday-notification
+      docker:
+        dockerfile: onlyoffice-monday-notification/Dockerfile
+    - image: onlyoffice-monday-gateway
+      context: onlyoffice-monday-gateway
+      docker:
+        dockerfile: onlyoffice-monday-gateway/Dockerfile
+manifests:
+  rawYaml:
+    - k8s/ingress.yml
+    - k8s/onlyoffice-configmap.yml
+    - k8s/onlyoffice-role.yml
+    - k8s/onlyoffice-secret.yml
+    - k8s/postgres-configmap.yml
+    - k8s/postgres-deployment.yml
+    - k8s/postgres-init-script.yml
+    - k8s/postgres-pvc.yml
+    - k8s/postgres-service.yml
+    - k8s/rabbit-deployment.yml
+    - k8s/rabbit-service.yml
+    - k8s/redis-deployment.yml
+    - k8s/redis-service.yml
+    - onlyoffice-monday-user/k8s/**.yml
+    - onlyoffice-monday-tenant/k8s/**.yml
+    - onlyoffice-monday-notification/k8s/**.yml
+    - onlyoffice-monday-gateway/k8s/**.yml

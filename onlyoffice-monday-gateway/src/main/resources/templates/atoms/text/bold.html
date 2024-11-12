@@ -1,0 +1,11 @@
+<template x-component="bold-text">
+    <span
+            x-data="{
+                text: $el.parentNode?.getAttribute('text') || $el.parentNode?.getAttribute('data-text') || '',
+                classes: $el.parentNode?.getAttribute('classes') || ''
+            }"
+            x-text="text"
+            class="font-bold"
+            :class="classes"
+    ></span>
+</template>

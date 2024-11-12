@@ -1,0 +1,44 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: onlyoffice-user
+  cloud:
+    kubernetes:
+      discovery:
+        enabled: false
+      config:
+        enabled: false
+  config:
+    import:
+      - "classpath:application-generic.yml"
+      - "classpath:stream.yml"
+  jpa:
+    properties:
+      hibernate:
+        default_schema: users
+  flyway:
+    schemas: users
+eureka:
+  client:
+    enabled: true
+resilience4j:
+  ratelimiter:
+    instances:
+      getUser:
+        limitForPeriod: 100
+        limitRefreshPeriod: 1s
+        timeoutDuration: 0
+        registerHealthIndicator: true
+        eventConsumerBufferSize: 100
+      registerUser:
+        limitForPeriod: 50
+        limitRefreshPeriod: 1s
+        timeoutDuration: 0
+        registerHealthIndicator: true
+        eventConsumerBufferSize: 50
+info:
+  app:
+    name: "onlyoffice-user"
+    description: "ONLYOFFICE x Monday User Service"
+    version: "1.0.0"

@@ -1,0 +1,13 @@
+server:
+  port: 3434
+spring:
+  application:
+    name: onlyoffice.notification
+  config:
+    import:
+      - "classpath:application-generic.yml"
+      - "classpath:camel.yml"
+      - "classpath:stream.yml"
+management:
+  tracing:
+    enabled: false

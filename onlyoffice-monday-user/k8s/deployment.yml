@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: onlyoffice-user
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: onlyoffice-user
+  template:
+    metadata:
+      labels:
+        app: onlyoffice-user
+    spec:
+      serviceAccountName: onlyoffice-user-sa
+      initContainers:
+        - name: wait-for-postgres
+          image: busybox
+          command: [ 'sh', '-c', 'timeout 120s sh -c "until nc -z postgres 5432; do echo waiting for postgres; sleep 2; done"' ]
+        - name: wait-for-rabbitmq
+          image: busybox
+          command: [ 'sh', '-c', 'timeout 120s sh -c "until nc -z rabbitmq 5672; do echo waiting for rabbitmq; sleep 2; done"' ]
+        - name: wait-for-redis
+          image: busybox
+          command: [ 'sh', '-c', 'timeout 120s sh -c "until nc -z redis 6379; do echo waiting for redis; sleep 2; done"' ]
+      containers:
+        - name: onlyoffice-user
+          image: onlyoffice-monday-user
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: kubernetes
+            - name: SPRING_DATASOURCE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: onlyoffice
+                  key: spring.datasource.url
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: onlyoffice
+                  key: spring.datasource.username
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: onlyoffice
+                  key: spring.datasource.password
+            - name: SPRING_RABBITMQ_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: onlyoffice
+                  key: spring.rabbitmq.host
+            - name: SPRING_RABBITMQ_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: onlyoffice
+                  key: spring.rabbitmq.port
+            - name: SPRING_RABBITMQ_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: onlyoffice
+                  key: spring.rabbitmq.username
+            - name: SPRING_RABBITMQ_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: onlyoffice
+                  key: spring.rabbitmq.password
+            - name: SPRING_DATA_REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: onlyoffice
+                  key: spring.data.redis.host
+            - name: SPRING_DATA_REDIS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: onlyoffice
+                  key: spring.data.redis.port
+            - name: SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_MONDAY_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: onlyoffice
+                  key: spring.security.oauth2.client.registration.monday.clientId
+            - name: SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_MONDAY_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: onlyoffice
+                  key: spring.security.oauth2.client.registration.monday.clientSecret

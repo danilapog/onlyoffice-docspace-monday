@@ -1,0 +1,12 @@
+<template x-component="label">
+    <label
+            x-data="{
+                target: $el.getAttribute('for') || $el.getAttribute('data-for') || '',
+                text: $el.getAttribute('text') || $el.getAttribute('data-text') || '',
+                classes: $el.getAttribute('classes') || '',
+            }"
+            :for="target"
+            x-text="text"
+            :class="classes"
+    ></label>
+</template>

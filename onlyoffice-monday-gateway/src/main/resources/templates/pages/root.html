@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/monday-sdk-js/dist/main.js"></script>
+    <script src="https://storage.onlyoffice.com/docspace/static/scripts/sdk/1.0.1/api.js"></script>
+    <script src="https://unpkg.com/htmx.org@2.0.3"
+            integrity="sha384-0895/pl2MU10Hqc6jd4RvrthNlDiE9U1tWmX7WRESftEDRosgxNsQG/Ze9YMRzHq"
+            crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/ws.js"></script>
+    <script th:src="@{/webSocket.js}"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" type="text/css" media="all" th:href="@{/main.css}" />
+    <script>
+        document.addEventListener("alpine:init", () => {
+            Alpine.data("root", () => ({
+                rootReady: false,
+                persistedUrl: '[[${page?.data?.login?.url}]]',
+                persistedEmail: '[[${page?.data?.login?.email}]]',
+                persistedHash: '[[${page?.data?.login?.hash}]]',
+                loginError: '[[${page?.data?.login?.error}]]',
+                init() {
+                    if (this.persistedUrl && this.persistedEmail && this.persistedHash) {
+                            window.DocSpace.SDK.initSystem({
+                                src: this.persistedUrl,
+                                frameId: 'root-ds',
+                                events: {
+                                    onAppReady: async () => {
+                                        try {
+                                            await DocSpace.SDK.frames['root-ds'].login(this.persistedEmail, this.persistedHash);
+                                        } catch (error) {
+                                             this.monday.execute("notice", {
+                                                message: this.loginError,
+                                                type: "error",
+                                                timeout: 10000,
+                                             });
+                                        } finally {
+                                            this.rootReady = true;
+                                            await DocSpace.SDK.frames['root-ds'].destroyFrame();
+                                        }
+                                    },
+                                    onAppError: (error) => {
+                                        this.monday.execute("notice", {
+                                            message: this.loginError,
+                                            type: "error",
+                                            timeout: 10000,
+                                        });
+                                        this.rootReady = true;
+                                    }
+                                }
+                            });
+                    } else {
+                        this.rootReady = true;
+                    }
+                }
+            }));
+            Alpine.store("darkMode", {
+                on: false,
+                toggle() {
+                    this.on = ! this.on
+                },
+                async init() {
+                    mondaySdk().listen("context", (ctx) => {
+                        const { theme } = ctx.data;
+                        this.on = theme !== 'light';
+                    });
+                }
+            });
+        });
+    </script>
+</head>
+<body class="h-screen w-screen" x-data="root">
+    <div style="display: none;">
+        <div id="root-ds"></div>
+    </div>
+    <section x-show="rootReady" class="h-full w-full">
+        <div th:replace="~{__${page.location}__}"></div>
+    </section>
+</body>
+<script>
+    document.querySelectorAll('[x-component]').forEach(component => {
+        const componentName = `x-${component.getAttribute('x-component')}`;
+        if (!customElements.get(componentName)) {
+            class Component extends HTMLElement {
+                connectedCallback() {
+                    this.append(component.content.cloneNode(true));
+                }
+
+                data() {
+                    const attributes = this.getAttributeNames();
+                    const data = {};
+                    attributes.forEach(attribute => {
+                        data[attribute] = this.getAttribute(attribute);
+                    });
+                    return data;
+                }
+            }
+            customElements.define(componentName, Component);
+        }
+    });
+</script>
+</html>

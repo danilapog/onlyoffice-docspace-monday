@@ -1,0 +1,81 @@
+<template x-component="confirmation-modal">
+    <div x-data="{ ...{
+                modalOpened: false,
+                url: '/views/settings/change',
+                target: 'body',
+                swap: 'outerHTML',
+                disabled: false,
+                close() {
+                    this.modalOpened = false;
+                },
+                disable() {
+                    this.disabled = true;
+                },
+                init() {
+                    this.disabled = false;
+                }
+          }, ...$el.parentElement.data() }"
+         x-model="modal"
+         x-modelable="modalOpened"
+         x-show="modalOpened"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50"
+         aria-hidden="false"
+         tabindex="-1"
+    >
+        <div
+            class="shadow-lg rounded-lg overflow-hidden w-full max-w-lg mx-auto"
+            :class="[
+                $store?.darkMode?.on ? 'bg-gray-900' : 'bg-white'
+            ]"
+        >
+            <div class="h-14 flex items-center px-5">
+                <div class="w-full">
+                    <x-bold-text
+                        th:data-text="${page?.data?.modal?.confirmActionText} ?: 'Confirm your action'"
+                        classes="font-sans text-xl"
+                        :class="[
+                            $store?.darkMode?.on ? 'text-white' : ''
+                        ]"
+                    ></x-bold-text>
+                </div>
+                <button type="button" @click="close">
+                    <div th:replace="~{atoms/logo/svg/cross}"></div>
+                </button>
+            </div>
+            <div class="border-t border-gray-200 flex items-end h-11 pb-2 px-4">
+                <x-generic-text
+                    th:data-text="${page?.data?.modal?.agreementText} ?: 'Do you agree you want to change DocSpace portal address?'"
+                    classes="font-sans text-sm"
+                ></x-generic-text>
+            </div>
+            <div class="flex justify-center items-center h-20 w-full px-4">
+                <div class="w-full mr-4">
+                    <x-loader-button
+                        x-model="{ disabled, loading: disabled }"
+                        @click="disable"
+                        :hx-get="url"
+                        hx-trigger="click"
+                        :hx-target="target"
+                        :hx-swap="swap"
+                        th:data-text="${page?.data?.modal?.changeText} ?: 'Change'"
+                    ></x-loader-button>
+                </div>
+                <div class="w-full">
+                    <x-secondary-button
+                        x-model="{ disabled }"
+                        th:data-text="${page?.data?.modal?.cancelText} ?: 'Cancel'"
+                        @click="close"
+                        classes="w-[100%]"
+                    >
+                    </x-secondary-button>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

@@ -1,0 +1,43 @@
+spring:
+  data:
+    redis:
+      repositories:
+        enabled: false
+    jpa:
+      repositories:
+        enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      jakarta:
+        persistence:
+          query:
+            timeout: 3500
+      hibernate:
+        generate_statistics: false
+        jdbc:
+          batch_size: 20
+          time_zone: UTC
+    show-sql: false
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/monday}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+    hikari:
+      connection-timeout: 1500
+      idle-timeout: 300000
+      keepalive-time: 0
+      minimum-idle: 4
+      maximum-pool-size: 10
+  flyway:
+    baselineOnMigrate: true
+    enabled: true
+    locations: classpath:migration/postgres
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/monday}
+    user: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+    sql-migration-prefix: V
+    sql-migration-separator: __
+    sql-migration-suffixes: .sql
+    repeatable-sql-migration-prefix: R

@@ -1,0 +1,37 @@
+<div class="flex justify-center items-center flex-col h-full p-4 text-center">
+    <div>
+        <div th:replace="~{atoms/text/bold}"></div>
+        <div th:replace="~{atoms/text/generic}"></div>
+
+        <div th:replace="~{molecules/text/error}"></div>
+    </div>
+    <script>
+        function configurationErrorData() {
+            return {
+                async init() {
+                    const data = (await mondaySdk().get("context")).data;
+                    htmx.on('htmx:wsBeforeMessage', (evt) => {
+                        try {
+                            const msg = JSON.parse(evt.detail.message);
+                            if (msg && msg['tenant_id'] == data?.account?.id) {
+                                location.reload();
+                                return;
+                            }
+                        } catch(err) {
+                            return;
+                        }
+                    });
+                }
+            }
+        }
+    </script>
+    <template x-data="configurationErrorData"></template>
+    <div th:replace="~{atoms/logo/svg/horizontal}"></div>
+    <div th:replace="~{atoms/logo/svg/owl}"></div>
+    <x-error-text
+            x-data="webSocketConfiguration"
+            hx-ext="ws"
+            th:header="${page?.data?.error?.header} ?: 'Please wait'"
+            th:subtext="${page?.data?.error?.subtext} ?: 'Monday Administrator or Monday Member have to configure plugin first'"
+    ></x-error-text>
+</div>

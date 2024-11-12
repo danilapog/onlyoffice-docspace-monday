@@ -1,0 +1,101 @@
+server:
+  bucket4j:
+    rate-limits:
+      - method: GET
+        capacity: ${GET_RATE_LIMITER_CAPACITY:30}
+        refill:
+          tokens: ${GET_RATE_LIMITER_REFILL:30}
+          period: ${GET_RATE_LIMITER_PERIOD:1}
+          time-unit: ${GET_RATE_LIMITER_REFILL_UNIT:MINUTES}
+      - method: POST
+        capacity: ${POST_RATE_LIMITER_CAPACITY:3}
+        refill:
+          tokens: ${GET_RATE_LIMITER_REFILL:3}
+          period: ${GET_RATE_LIMITER_PERIOD:1}
+          time-unit: ${GET_RATE_LIMITER_REFILL_UNIT:SECONDS}
+  compression:
+    enabled: true
+    min-response-size: 512
+    mimeTypes:
+      - text/html
+      - text/css
+  port: 3030
+spring:
+  cloud:
+    kubernetes:
+      discovery:
+        enabled: false
+      config:
+        enabled: false
+    feign:
+      client:
+        onlyoffice-user-name: ONLYOFFICE-USER
+        onlyoffice-tenant-name: ONLYOFFICE-TENANT
+    openfeign:
+      circuitbreaker:
+        enabled: true
+  application:
+    name: onlyoffice-gateway
+  config:
+    import:
+      - "classpath:application-generic.yml"
+      - "classpath:stream.yml"
+eureka:
+  client:
+    enabled: true
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        registerHealthIndicator: true
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 100
+        minimumNumberOfCalls: 60
+        failureRateThreshold: 80
+        permittedNumberOfCallsInHalfOpenState: 25
+        waitDurationInOpenState: PT30S
+        ignoreExceptions:
+          - com.onlyoffice.gateway.exception.service.ServiceBadRequestException
+    instances:
+      tenantServiceCircuitBreaker:
+        baseConfig: default
+      userServiceCircuitBreaker:
+        baseConfig: default
+  retry:
+    configs:
+      default:
+        maxAttempts: 3
+        waitDuration: 250
+        enableExponentialBackoff: true
+        exponentialBackoffMultiplier: 2
+        ignoreExceptions:
+          - com.onlyoffice.gateway.exception.service.ServiceBadRequestException
+      command:
+        maxAttempts: 3
+        waitDuration: 250
+        enableExponentialBackoff: true
+        exponentialBackoffMultiplier: 2
+        ignoreExceptions:
+          - com.onlyoffice.gateway.exception.service.ServiceBadRequestException
+      query:
+        maxAttempts: 5
+        waitDuration: 150
+        enableExponentialBackoff: true
+        exponentialBackoffMultiplier: 2
+        ignoreExceptions:
+          - com.onlyoffice.gateway.exception.service.ServiceBadRequestException
+    instances:
+      tenantServiceCommandRetry:
+        baseConfig: command
+      tenantServiceQueryRetry:
+        baseConfig: query
+      userServiceCommandRetry:
+        baseConfig: command
+      userServiceQueryRetry:
+        baseConfig: query
+info:
+  app:
+    name: "onlyoffice-gateway"
+    description: "ONLYOFFICE x Monday Gateway Service"
+    version: "1.0.0"

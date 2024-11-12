@@ -1,0 +1,56 @@
+<template x-component="configuration-information">
+    <div>
+        <div class="mb-8">
+            <div th:replace="~{atoms/logo/svg/horizontal}"></div>
+        </div>
+        <div class="flex items-center">
+            <div class="mr-3">
+                <div th:replace="~{atoms/logo/svg/info}"></div>
+            </div>
+            <p th:text="${page?.data?.information?.csp} ?: 'Check the CSP settings'"
+               class="font-sans"
+               :class="[
+                    $store?.darkMode?.on ? 'text-white' : ''
+               ]"
+            ></p>
+        </div>
+        <div class="mt-2 w-full max-w-lg">
+            <span
+                    th:text="${page?.data?.information?.credentials} ?: 'Before connecting the app, please go to the DocSpace Settings - Developer tools - JavaScript SDK and add the following credentials to the allow list:'"
+                    class="font-sans"
+                    :class="[
+                    $store?.darkMode?.on ? 'text-white' : ''
+                 ]"
+            ></span>
+            <br/>
+            <br/>
+            <span>
+                <span
+                        th:text="${page?.data?.information?.monday} ?: 'Monday portal address:'"
+                        class="font-sans"
+                        :class="[
+                        $store?.darkMode?.on ? 'text-white' : ''
+                    ]"
+                ></span>
+                <span
+                        th:text="${page?.data?.information?.mondayAddress} ?: 'monday.onlyoffice.com'"
+                        class="ml-2 font-sans font-bold text-blue-500"
+                ></span>
+            </span>
+            <br/>
+            <span>
+                <span
+                        th:text="${page?.data?.information?.app} ?: 'ONLYOFFICE DocSpace app:'"
+                        class="font-sans"
+                        :class="[
+                        $store?.darkMode?.on ? 'text-white' : ''
+                    ]"
+                ></span>
+                <span
+                        th:text="${page?.data?.information?.appAddress} ?: 'monday.onlyoffice.com'"
+                        class="ml-2 font-sans font-bold text-blue-500"
+                ></span>
+            </span>
+        </div>
+    </div>
+</template>

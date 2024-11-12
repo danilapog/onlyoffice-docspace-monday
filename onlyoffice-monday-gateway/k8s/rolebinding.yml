@@ -1,0 +1,13 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: service-access-rolebinding-gateway
+  namespace: default
+subjects:
+  - kind: ServiceAccount
+    name: onlyoffice-gateway-sa
+    namespace: default
+roleRef:
+  kind: Role
+  name: service-access-role
+  apiGroup: rbac.authorization.k8s.io

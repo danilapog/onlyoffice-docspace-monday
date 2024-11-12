@@ -1,0 +1,41 @@
+<template x-component="input">
+    <input
+            x-data="() => ({
+                valid: true,
+                classes: $el.parentNode?.getAttribute('classes') || '',
+                init() {
+                    if (typeof this.type === 'undefined') {
+                        this.type = $el.parentNode?.getAttribute('type') || 'text';
+                    }
+
+                    if (typeof this.disabled === 'undefined') {
+                        this.disabled = $el.parentNode?.getAttribute('disabled') === 'true' || false;
+                    }
+
+                    if (typeof this.error === 'undefined') {
+                        this.error = $el.parentNode?.getAttribute('error') === 'true' || false;
+                    }
+
+                    if (typeof this.value === 'undefined') {
+                        this.value = $el.parentElement?._x_model?.get('value') || $el.parentNode?.getAttribute('value') || '';
+                    }
+                }
+            })"
+            :id="$el.parentNode?.getAttribute('id') || ''"
+            :name="$el.parentNode?.getAttribute('name') || ''"
+            :type="type"
+            :placeholder="$el.parentNode?.getAttribute('placeholder') || ''"
+            :pattern="$el.parentNode?.getAttribute('pattern') || ''"
+            :disabled="$el.parentNode?.getAttribute('disabled') || disabled"
+            :value="value"
+            x-model="value"
+            class="px-3 py-2 border rounded-md w-full h-full focus:outline-none focus:ring-0 disabled:cursor-not-allowed"
+            :class="[
+                (valid && !error) ? 'border-gray-300' : 'border-red-500',
+                $store?.darkMode?.on ? 'bg-input-dark text-white disabled:bg-gray-400 disabled:text-gray-300' : 'disabled:bg-gray-100',
+                classes
+            ]"
+            @input="error = false; valid = $el.checkValidity()"
+            @blur="valid = $el.checkValidity()"
+    />
+</template>

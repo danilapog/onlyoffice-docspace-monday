@@ -1,0 +1,17 @@
+<template x-component="docspace-settings-form">
+    <x-docspace-common-form>
+    </x-docspace-common-form>
+    <x-loader-button
+            th:data-text="${page?.data?.settingsForm?.loginText} ?: 'Login'"
+            type="submit"
+    ></x-loader-button>
+    <div x-show="admin && change">
+        <x-secondary-button
+                th:data-text="${page?.data?.settingsForm?.changeText} ?: 'Change DocSpace'"
+                type="button"
+                @click="toggleModal"
+                classes="mt-4"
+        >
+        </x-secondary-button>
+    </div>
+</template>

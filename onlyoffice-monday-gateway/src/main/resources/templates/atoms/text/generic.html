@@ -1,0 +1,13 @@
+<template x-component="generic-text">
+    <span
+            x-data="{
+                text: $el.parentNode?.getAttribute('text') || $el.parentNode?.getAttribute('data-text') || '',
+                classes: $el.parentNode?.getAttribute('classes') || ''
+            }"
+            x-text="text"
+            :class="[
+                $store?.darkMode?.on ? 'text-slate-50' : '',
+                classes
+            ]"
+    ></span>
+</template>

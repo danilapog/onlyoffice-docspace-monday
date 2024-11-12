@@ -1,0 +1,78 @@
+spring:
+  cloud:
+    function:
+      definition: refreshKeyConsumer;inviteUsersConsumer
+    stream:
+      bindings:
+        refreshKeyConsumer-in-0:
+          destination: asc.rooms
+          group: refresh.key.consumer
+          content-type: application/json
+          binder: rabbit
+          consumer:
+            concurrency: 3
+            maxAttempts: 5
+            defaultRetryable: true
+            backOffInitialInterval: 2000
+            backOffMultiplier: 2.0
+        inviteUsersConsumer-in-0:
+          destination: asc.rooms
+          group: invitation.consumer
+          content-type: application/json
+          binder: rabbit
+          consumer:
+            concurrency: 1
+            maxAttempts: 3
+            defaultRetryable: true
+            backOffInitialInterval: 2000
+            backOffMultiplier: 2.0
+        refreshKeyConsumer-out-0:
+          destination: asc.rooms
+          binder: rabbit
+        inviteUsersConsumer-out-0:
+          destination: asc.rooms
+          binder: rabbit
+        registerUserConsumer-out-0:
+          destination: asc.users
+          binder: rabbit
+        removeTenantUsersConsumer-out-0:
+          destination: asc.users
+          binder: rabbit
+      rabbit:
+        bindings:
+          refreshKeyConsumer-in-0:
+            consumer:
+              bindingRoutingKey: refresh.key
+              autoBindDlq: true
+              deadLetterQueueName: asc.rooms.refresh.dlq
+              deadLetterExchange: asc.rooms.dlx
+              deadLetterExchangeType: topic
+              dlqTtl: 600000
+          inviteUsersConsumer-in-0:
+            consumer:
+              bindingRoutingKey: invite.users
+              autoBindDlq: true
+              deadLetterQueueName: asc.rooms.invite.dlq
+              deadLetterExchange: asc.rooms.dlx
+              deadLetterExchangeType: topic
+              dlqTtl: 600000
+          refreshKeyConsumer-out-0:
+            producer:
+              routingKey: refresh.key
+              exchange: asc.rooms
+              exchangeType: topic
+          inviteUsersConsumer-out-0:
+            producer:
+              routingKey: invite.users
+              exchange: asc.rooms
+              exchangeType: topic
+          registerUserConsumer-out-0:
+            producer:
+              routingKey: upsert.user
+              exchange: asc.users
+              exchangeType: topic
+          removeTenantUsersConsumer-out-0:
+            producer:
+              routingKey: delete.users
+              exchange: asc.users
+              exchangeType: topic

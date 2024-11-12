@@ -1,0 +1,40 @@
+spring:
+  cloud:
+    function:
+      definition: badUserUpsertConsumer;badInviteUsersConsumer
+    stream:
+      bindings:
+        badUserUpsertConsumer-in-0:
+          group: asc.users.upsert.dlq
+          content-type: application/json
+          binder: rabbit
+          consumer:
+            concurrency: 3
+            maxAttempts: 5
+            defaultRetryable: true
+            backOffInitialInterval: 3000
+            backOffMultiplier: 3.0
+        badInviteUsersConsumer-in-0:
+          group: asc.rooms.invite.dlq
+          content-type: application/json
+          binder: rabbit
+          consumer:
+            concurrency: 3
+            maxAttempts: 5
+            defaultRetryable: true
+            backOffInitialInterval: 3000
+            backOffMultiplier: 3.0
+      rabbit:
+        bindings:
+          badUserUpsertConsumer-in-0:
+            consumer:
+              queueNameGroupOnly: true
+              declareExchange: false
+              bindQueue: false
+              republishToDlq: false
+          badInviteUsersConsumer-in-0:
+            consumer:
+              queueNameGroupOnly: true
+              declareExchange: false
+              bindQueue: false
+              republishToDlq: false

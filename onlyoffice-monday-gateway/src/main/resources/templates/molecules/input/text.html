@@ -1,0 +1,42 @@
+<template x-component="text-field">
+    <div x-data="() => ({
+                id: $el.parentNode?.getAttribute('id') || '',
+                name: $el.parentNode?.getAttribute('name') || '',
+                label: $el.parentNode?.getAttribute('label') || '',
+                placeholder: $el.parentNode?.getAttribute('placeholder') || 'Enter text',
+                pattern: $el.parentNode?.getAttribute('pattern') || '.*',
+                classes: $el.parentNode?.getAttribute('classes') || '',
+                value: $el.parentElement?._x_model?.get('value') || $el.parentNode?.getAttribute('value') || '',
+                manualDisabled: $el.parentNode?.getAttribute('disabled') || false,
+            })"
+            x-modelable="value"
+            :class="classes"
+    >
+        <x-label :for="id" :text="label"></x-label>
+
+        <template x-if="manualDisabled">
+            <x-input
+                    :id="id"
+                    :name="name"
+                    :placeholder="placeholder"
+                    :pattern="pattern"
+                    :value="value"
+                    :disabled="manualDisabled"
+                    classes="'w-full truncate overflow-ellipsis font-sans'"
+                    x-model="value"
+            ></x-input>
+        </template>
+
+        <template x-if="!manualDisabled">
+            <x-input
+                    :id="id"
+                    :name="name"
+                    :placeholder="placeholder"
+                    :pattern="pattern"
+                    :value="value"
+                    classes="'w-full truncate overflow-ellipsis font-sans'"
+                    x-model="value"
+            ></x-input>
+        </template>
+    </div>
+</template>

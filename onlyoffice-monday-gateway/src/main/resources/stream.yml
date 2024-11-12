@@ -1,0 +1,14 @@
+spring:
+  cloud:
+    stream:
+      bindings:
+        registerUserConsumer-out-0:
+          destination: asc.users
+          binder: rabbit
+      rabbit:
+        bindings:
+          registerUserConsumer-out-0:
+            producer:
+              exchange: asc.users
+              routingKey: upsert.user
+              declareExchange: false

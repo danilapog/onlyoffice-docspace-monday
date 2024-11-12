@@ -1,0 +1,2 @@
+com.onlyoffice.common.client.notification.factory.RedisNotificationPublisherFactory
+com.onlyoffice.common.client.notification.factory.RedisNotificationListenerConfiguration

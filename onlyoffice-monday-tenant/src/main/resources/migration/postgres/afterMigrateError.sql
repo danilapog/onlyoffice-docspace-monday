@@ -1,0 +1,1 @@
+DELETE IGNORE FROM tenants.flyway_schema_history WHERE success=0;

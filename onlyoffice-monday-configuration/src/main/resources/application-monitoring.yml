@@ -1,0 +1,30 @@
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus,metrics,info,shutdown
+  tracing:
+    enabled: ${MANAGEMENT_TRACING_ENABLED:false}
+    sampling:
+      probability: ${MANAGEMENT_TRACING_SAMPLING_PROBABILITY:0.5}
+  endpoint:
+    health:
+      readiness-state:
+        enabled: true
+      liveness-state:
+        enabled: true
+    shutdown:
+      enabled: true
+  otlp:
+    enabled: ${MANAGEMENT_OTLP_ENABLED:false}
+    metrics:
+      export:
+        url: ${MANAGEMENT_OTLP_METRICS_EXPORT_URL:http://localhost:4318/v1/metrics}
+    tracing:
+      endpoint: ${MANAGEMENT_OTLP_TRACING_ENDPOINT:http://localhost:4318/v1/traces}
+  info:
+    env:
+      enabled: true
+endpoints:
+  shutdown:
+    enabled: true

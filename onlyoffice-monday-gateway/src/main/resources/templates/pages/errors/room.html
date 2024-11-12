@@ -1,0 +1,36 @@
+<div class="flex justify-center items-center flex-col h-full">
+    <div>
+        <div th:replace="~{atoms/text/bold}"></div>
+        <div th:replace="~{atoms/text/generic}"></div>
+
+        <div th:replace="~{molecules/text/error}"></div>
+    </div>
+    <script>
+        function roomErrorData() {
+            return {
+                async init() {
+                    const data = (await mondaySdk().get("context")).data;
+                    htmx.on('htmx:wsBeforeMessage', (evt) => {
+                        try {
+                            const msg = JSON.parse(evt.detail.message);
+                            if (msg && msg['tenant_id'] == data?.account?.id) {
+                                location.reload();
+                                return;
+                            }
+                        } catch(err) {
+                            return;
+                        }
+                    });
+                }
+            }
+        }
+    </script>
+    <template x-data="roomErrorData"></template>
+    <div th:replace="~{atoms/logo/svg/ant}"></div>
+    <x-error-text
+        x-data="webSocketConfiguration"
+        hx-ext="ws"
+        th:header="${page?.data?.error?.header} ?: 'Not Found'"
+        th:subtext="${page?.data?.error?.subtext} ?: 'The required room was not found. Please check if the room still exists or contact the administrator.'"
+    ></x-error-text>
+</div>

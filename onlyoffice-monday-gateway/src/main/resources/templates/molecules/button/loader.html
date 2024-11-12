@@ -1,0 +1,32 @@
+<template x-component="loader-button">
+    <button
+            x-data="{
+                text: $el.parentNode?.getAttribute('text') || $el.parentNode?.getAttribute('data-text') || 'Button',
+                type: $el.parentNode?.getAttribute('type') || 'button',
+                classes: $el.parentNode?.getAttribute('classes') || '',
+                init() {
+                    if (typeof this.disabled === 'undefined') {
+                        this.disabled = false;
+                    }
+
+                    if (typeof this.loading === 'undefined') {
+                        this.loading = false;
+                    }
+                }
+            }"
+            class="font-bold py-2 px-4 rounded-md w-full focus:outline-none focus:ring-0
+                   disabled:hover:shadow-none disabled:cursor-not-allowed"
+            :class="[
+                $store?.darkMode?.on ? 'bg-login-blue text-white disabled:bg-gray-400' : 'bg-login-blue text-white disabled:bg-gray-300',
+                classes
+            ]"
+            style="height: 44px"
+            aria-pressed="false"
+            :type="type"
+            :disabled="loading || disabled">
+        <span x-show="!loading" x-text="text"></span>
+        <div x-show="loading" class="w-full h-full flex justify-center items-center">
+            <x-basic-spinner></x-basic-spinner>
+        </div>
+    </button>
+</template>

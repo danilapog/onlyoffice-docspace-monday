@@ -1,0 +1,5 @@
+camel:
+  component:
+    telegram:
+      authToken: ${TELEGRAM_AUTH_TOKEN:}
+      chatId: ${TELEGRAM_CHAT_ID:}
