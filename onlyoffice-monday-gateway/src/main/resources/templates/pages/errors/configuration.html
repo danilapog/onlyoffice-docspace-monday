@@ -14,7 +14,7 @@
                         try {
                             const msg = JSON.parse(evt.detail.message);
                             if (msg && msg['tenant_id'] == data?.account?.id) {
-                                location.reload();
+                                htmx.ajax('GET', `/views?boardId=${data.boardId}`, { target: '#content', swap: 'outerHTML' });
                                 return;
                             }
                         } catch(err) {

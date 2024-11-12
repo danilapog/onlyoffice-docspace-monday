@@ -75,7 +75,7 @@
     <div style="display: none;">
         <div id="root-ds"></div>
     </div>
-    <section x-show="rootReady" class="h-full w-full">
+    <section id="content" x-show="rootReady" class="h-full w-full">
         <div th:replace="~{__${page.location}__}"></div>
     </section>
 </body>
