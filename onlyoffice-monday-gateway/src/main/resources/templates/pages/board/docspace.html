@@ -8,27 +8,25 @@
             return {
                 initialized: false,
                 url: '[[${page?.data?.login?.url}]]',
-                boardId: -1,
                 roomId: '[[${page?.data?.docSpaceManager?.roomId}]]',
                 accessKey: '[[${page?.data?.docSpaceManager?.accessKey}]]',
-                notification: '[[${page?.data?.docSpaceManager?.notificationText}]]',
                 loggedIn: true,
-                async init() {
+                socketHandler: async (evt) => {
+                    const notification = '[[${page?.data?.docSpaceManager?.notificationText}]]';
                     const { boardId } = (await mondaySdk().get("context")).data;
-                    this.boardId = boardId;
-
-                    htmx.on("htmx:wsBeforeMessage", async (evt) => {
-                        const msg = JSON.parse(evt.detail.message);
-                        if (msg && msg.type == "refresh_access_token" && msg["board_id"] == this.boardId) {
-                            await mondaySdk().execute("notice", {
-                                message: this.notification,
-                                type: "info",
-                                timeout: 10000,
-                            });
-                            return;
-                        }
+                    const msg = JSON.parse(evt.detail.message);
+                    if (msg && msg.type == "refresh_access_token" && msg["board_id"] == boardId)
+                        await mondaySdk().execute("notice", {
+                            message: notification,
+                            type: "info",
+                            timeout: 10000,
+                        });
+                },
+                async init() {
+                    htmx.on("htmx:wsBeforeMessage", this.socketHandler);
+                    htmx.on('htmx:beforeSwap', (evt) => {
+                        htmx.off('htmx:wsBeforeMessage', this.socketHandler);
                     });
-
                     const res = await mondaySdk().get("context");
                     const { theme } = res.data;
 
@@ -73,7 +71,7 @@
         }
     </script>
     <main class="w-full h-screen" x-data="docspaceManager()">
-        <div class="h-full w-full" x-data="webSocketConfiguration" hx-ext="ws">
+        <div class="h-full w-full">
             <div id="docspace-container" class="w-full h-full" x-show="loggedIn">
                 <div id="docspace" class="w-full h-full" x-show="loggedIn">
                     <div id="ds-frame" class="w-full h-full"></div>

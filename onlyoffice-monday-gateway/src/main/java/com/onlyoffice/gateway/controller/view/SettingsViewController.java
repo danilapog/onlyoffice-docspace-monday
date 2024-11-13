@@ -8,11 +8,11 @@ import com.onlyoffice.gateway.controller.view.model.PageRendererWrapper;
 import com.onlyoffice.gateway.controller.view.model.settings.*;
 import com.onlyoffice.gateway.security.MondayAuthenticationPrincipal;
 import java.net.URI;
-import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,60 +35,74 @@ public class SettingsViewController {
   @GetMapping
   public ModelAndView renderSettings(@AuthenticationPrincipal MondayAuthenticationPrincipal user) {
     log.debug("Rendering settings page");
+    return getSettingsView(user, false);
+  }
+
+  @Secured("ROLE_ADMIN")
+  @GetMapping("/change")
+  public ModelAndView renderChange(@AuthenticationPrincipal MondayAuthenticationPrincipal user) {
+    log.debug("Rendering change page");
+    return renderPartialView(
+        TemplateLocation.ADMIN_CONFIGURE.getPath(), buildAdminConfigureModel(user.getSlug()));
+  }
+
+  @GetMapping("/refresh")
+  public ModelAndView refreshSettings(@AuthenticationPrincipal MondayAuthenticationPrincipal user) {
+    log.debug("Refreshing settings page");
+    return getSettingsView(user, true);
+  }
+
+  private ModelAndView getSettingsView(MondayAuthenticationPrincipal user, boolean partial) {
     var tenantResponse = tenantService.findTenant(user.getAccountId());
     var tenantExists =
         tenantResponse.getStatusCode().is2xxSuccessful() && tenantResponse.getBody() != null;
 
     if (!tenantExists) {
-      log.debug("Rendering page when tenant does not exist");
       return user.isAdmin()
-          ? renderPage(TemplateLocation.ADMIN_CONFIGURE, buildAdminConfigureModel(user.getSlug()))
-          : renderErrorPage(
+          ? renderAdminConfigureView(user.getSlug(), partial)
+          : renderErrorView(
               messageService.getMessage("pages.errors.configuration.header"),
-              messageService.getMessage("pages.errors.configuration.subtext"));
+              messageService.getMessage("pages.errors.configuration.subtext"),
+              TemplateLocation.NOT_CONFIGURED_ERROR.getPath(),
+              partial);
     }
 
-    Function<String, ModelAndView> renderLoginPage =
-        user.isAdmin()
-            ? url ->
-                renderPage(TemplateLocation.ADMIN_LOGIN, buildAdminLoginModel(url, user.getSlug()))
-            : url ->
-                renderPage(TemplateLocation.USER_LOGIN, buildUserLoginModel(url, user.getSlug()));
-
-    return renderLoginPage.apply(tenantResponse.getBody().getDocSpaceUrl());
+    var docSpaceUrl = tenantResponse.getBody().getDocSpaceUrl();
+    return user.isAdmin()
+        ? renderLoginView(
+            TemplateLocation.ADMIN_LOGIN,
+            buildAdminLoginModel(docSpaceUrl, user.getSlug()),
+            partial)
+        : renderLoginView(
+            TemplateLocation.USER_LOGIN, buildUserLoginModel(docSpaceUrl, user.getSlug()), partial);
   }
 
-  @GetMapping("/change")
-  public ModelAndView renderChange(@AuthenticationPrincipal MondayAuthenticationPrincipal user) {
-    log.debug("Rendering change page");
-    return renderPage(TemplateLocation.ADMIN_CONFIGURE, buildAdminConfigureModel(user.getSlug()));
+  private ModelAndView renderLoginView(TemplateLocation location, Object model, boolean partial) {
+    return partial
+        ? renderPartialView(location.getPath(), model)
+        : renderFullView(location.getPath(), model);
   }
 
-  private ModelAndView renderPage(TemplateLocation location, Object dataModel) {
-    return new ModelAndView(
-        "pages/root",
-        "page",
-        PageRendererWrapper.builder().location(location.getPath()).data(dataModel).build());
+  private ModelAndView renderAdminConfigureView(String slug, boolean partial) {
+    var model = buildAdminConfigureModel(slug);
+    return partial
+        ? renderPartialView(TemplateLocation.ADMIN_CONFIGURE.getPath(), model)
+        : renderFullView(TemplateLocation.ADMIN_CONFIGURE.getPath(), model);
   }
 
-  private ModelAndView renderErrorPage(String header, String subtext) {
-    log.debug("Rendering not configured page");
-    return renderPage(
-        TemplateLocation.NOT_CONFIGURED_ERROR,
+  private ModelAndView renderErrorView(
+      String header, String subtext, String path, boolean partial) {
+    var model =
         ErrorPageModel.builder()
+            .refresh("/views/settings/refresh")
             .error(ErrorPageModel.ErrorText.builder().header(header).subtext(subtext).build())
-            .build());
+            .build();
+    return partial ? renderPartialView(path, model) : renderFullView(path, model);
   }
 
   private SettingsAdminConfigureModel buildAdminConfigureModel(String slug) {
     return SettingsAdminConfigureModel.builder()
-        .login(
-            LoginModel.builder()
-                .accessText(messageService.getMessage("pages.settings.configure.login.accessText"))
-                .addressText(slug)
-                .error(messageService.getMessage("pages.settings.configure.login.error"))
-                .success(messageService.getMessage("pages.settings.configure.login.success"))
-                .build())
+        .login(buildSettingsLoginModel(selfOrigin, slug))
         .information(buildSettingsConfigureInformationModel(slug))
         .settingsForm(buildSettingsLoginFormModel())
         .build();
@@ -172,5 +186,15 @@ public class SettingsViewController {
     var domain = parts.length > 1 ? parts[parts.length - 2] : "";
     var zone = parts.length > 0 ? parts[parts.length - 1] : "";
     return String.format("%s.%s.%s", subdomain, domain, zone);
+  }
+
+  private <T> ModelAndView renderFullView(String location, T data) {
+    return new ModelAndView(
+        "pages/root", "page", PageRendererWrapper.builder().location(location).data(data).build());
+  }
+
+  private <T> ModelAndView renderPartialView(String location, T data) {
+    return new ModelAndView(
+        location, "page", PageRendererWrapper.builder().location(location).data(data).build());
   }
 }

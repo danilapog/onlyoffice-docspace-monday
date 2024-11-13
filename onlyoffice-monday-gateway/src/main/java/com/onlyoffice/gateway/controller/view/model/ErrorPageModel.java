@@ -8,6 +8,7 @@ import lombok.Setter;
 @Setter
 @Builder
 public class ErrorPageModel {
+  @Builder.Default private String refresh = "";
   @Builder.Default private ErrorText error = ErrorText.builder().build();
   @Builder.Default private LoginModel login = LoginModel.builder().build();
 

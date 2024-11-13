@@ -1,4 +1,4 @@
-<div x-data="webSocketConfiguration" hx-ext="ws">
+<div>
     <div>
         <div th:replace="~{atoms/input/base}"></div>
         <div th:replace="~{atoms/input/label}"></div>
@@ -36,20 +36,22 @@
                     this.disabled = true;
                     this.loading = true;
                 },
+                socketHandler: async (evt) => {
+                    try {
+                        const data = (await this.monday.get("context")).data;
+                        const msg = JSON.parse(evt.detail.message);
+                        if (msg && msg['tenant_id'] == data?.account?.id)
+                            htmx.ajax('GET', `/views/refresh?boardId=${data?.boardId}`, { target: '#content', swap: 'innerHTML' });
+                    } catch (err) {
+                        console.log(err);
+                    }
+                },
                 async init() {
                     this.monday = mondaySdk();
                     const data = (await this.monday.get("context")).data;
-                    htmx.on('htmx:wsBeforeMessage', (evt) => {
-                        try {
-                            const msg = JSON.parse(evt.detail.message);
-                            if (msg && msg['tenant_id'] == data?.account?.id) {
-                                location.reload();
-                                return;
-                            }
-                        } catch (err) {
-                            console.log(err);
-                            return;
-                        }
+                    htmx.on('htmx:wsBeforeMessage', this.socketHandler);
+                    htmx.on('htmx:beforeSwap', (evt) => {
+                        htmx.off('htmx:wsBeforeMessage', this.socketHandler);
                     });
                     htmx.on('htmx:beforeRequest', async (evt) => {
                         if (evt.detail.pathInfo.finalRequestPath !== this.path) {
@@ -97,7 +99,7 @@
                                                            type: "success",
                                                            timeout: 10000,
                                                         });
-                                                        location.reload();
+                                                        htmx.ajax('GET', `/views/refresh?boardId=${data?.boardId}`, { target: '#content', swap: 'innerHTML' });
                                                     }
                                                 }).catch(error => {
                                                     this.setError();

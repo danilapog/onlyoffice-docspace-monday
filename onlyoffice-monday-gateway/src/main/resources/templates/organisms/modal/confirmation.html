@@ -2,8 +2,8 @@
     <div x-data="{ ...{
                 modalOpened: false,
                 url: '/views/settings/change',
-                target: 'body',
-                swap: 'outerHTML',
+                target: '#content',
+                swap: 'innerHTML',
                 disabled: false,
                 close() {
                     this.modalOpened = false;

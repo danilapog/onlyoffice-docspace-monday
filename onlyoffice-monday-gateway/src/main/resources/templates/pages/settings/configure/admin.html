@@ -22,7 +22,7 @@
                 <div class="w-full max-w-[500px]">
                     <x-configuration-information class="w-full"></x-configuration-information>
                 </div>
-                <form class="bg-white p-8 rounded-lg shadow-lg"
+                <form class="p-8 rounded-lg shadow-lg"
                       :class="[
                           $store?.darkMode?.on ? 'bg-background-dark' : 'bg-white'
                       ]"
@@ -63,6 +63,7 @@
                 init() {
                     this.monday = mondaySdk();
                     htmx.on('htmx:beforeRequest', async (evt) => {
+                        const { boardId } = (await mondaySdk().get("context")).data;
                         if (evt.detail.pathInfo.finalRequestPath !== this.path) {
                             return;
                         }
@@ -108,7 +109,7 @@
                                                            type: "success",
                                                            timeout: 10000,
                                                         });
-                                                        location.reload();
+                                                        htmx.ajax('GET', `/views/settings/refresh?boardId=${boardId}`, { target: '#content', swap: 'innerHTML' });
                                                     }
                                                 }).catch(error => {
                                                     this.setError();

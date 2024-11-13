@@ -1,4 +1,4 @@
-<div x-data="webSocketConfiguration" hx-ext="ws">
+<div>
     <div>
         <div th:replace="~{atoms/loader/spinner}"></div>
         <div th:replace="~{atoms/text/bold}"></div>
@@ -17,21 +17,6 @@
                 loading: false,
                 disabled: false,
                 onAppReadyProcessed: false,
-                async init() {
-                    this.monday = mondaySdk();
-                    const { boardId } = (await this.monday.get("context")).data;
-                    htmx.on('htmx:wsBeforeMessage', (evt) => {
-                        try {
-                            const msg = JSON.parse(evt.detail.message);
-                            if (msg && msg.type == "room_created" && msg["board_id"] == this.boardId) {
-                                location.reload();
-                                return;
-                            }
-                        } catch(err) {
-                            console.log(err);
-                        }
-                    });
-                },
                 disable() {
                     this.disabled = true;
                     this.loading = true;
@@ -121,8 +106,6 @@
                                             roomId: roomResult?.value?.id,
                                             users: ids,
                                         },
-                                    }).then(response => {
-                                        location.reload();
                                     }).catch(async (error) => {
                                         this.enable();
                                         this.onAppReadyProcessed = false;
@@ -140,14 +123,30 @@
                                         type: "error",
                                         timeout: 10000,
                                     });
-                                    return;
                                 } finally {
                                     await DocSpace.SDK.frames['ds-frame'].destroyFrame();
                                 }
                             },
                         }
                     });
-                }
+                },
+                socketHandler: async (evt) => {
+                    try {
+                        const { boardId } = (await this.monday.get("context")).data;
+                        const msg = JSON.parse(evt.detail.message);
+                        if (msg && msg.type == "room_created" && msg["board_id"] == boardId)
+                            htmx.ajax('GET', `/views/refresh?boardId=${boardId}`, { target: '#content', swap: 'innerHTML' });
+                    } catch (err) {
+                        console.log(err);
+                    }
+                },
+                async init() {
+                    this.monday = mondaySdk();
+                    htmx.on('htmx:wsBeforeMessage', this.socketHandler);
+                    htmx.on('htmx:beforeSwap', (evt) => {
+                        htmx.off('htmx:wsBeforeMessage', this.socketHandler);
+                    });
+                },
             }
         }
     </script>

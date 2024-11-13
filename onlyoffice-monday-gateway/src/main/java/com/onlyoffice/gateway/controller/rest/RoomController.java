@@ -59,7 +59,9 @@ public class RoomController {
 
       log.debug("Room created notification has been sent");
 
-      return ResponseEntity.status(response.getStatusCode().value()).build();
+      return ResponseEntity.status(response.getStatusCode().value())
+          .header("HX-Refresh", "true")
+          .build();
     } finally {
       MDC.clear();
     }

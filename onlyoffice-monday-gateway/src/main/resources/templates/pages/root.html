@@ -75,12 +75,12 @@
     <div style="display: none;">
         <div id="root-ds"></div>
     </div>
-    <section id="content" x-show="rootReady" class="h-full w-full">
+    <section id="content" x-show="rootReady" class="h-full w-full" x-data="webSocketConfiguration" hx-ext="ws">
         <div th:replace="~{__${page.location}__}"></div>
     </section>
 </body>
 <script>
-    document.querySelectorAll('[x-component]').forEach(component => {
+    const initComponents = () => document.querySelectorAll('[x-component]').forEach(component => {
         const componentName = `x-${component.getAttribute('x-component')}`;
         if (!customElements.get(componentName)) {
             class Component extends HTMLElement {
@@ -100,5 +100,7 @@
             customElements.define(componentName, Component);
         }
     });
+    initComponents();
+    htmx.on('htmx:load', () => initComponents());
 </script>
 </html>

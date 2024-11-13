@@ -33,7 +33,7 @@
                      th:data-text="${page?.data?.login?.addressText} ?: 'docspace.server.info'"
                 ></x-bold-text>
             </div>
-            <form class="bg-white p-8 rounded-lg shadow-lg"
+            <form class="p-8 rounded-lg shadow-lg"
                   :class="[
                       $store?.darkMode?.on ? 'bg-background-dark' : 'bg-white'
                   ]"
@@ -63,6 +63,11 @@
                 loginSuccess: "[[${page?.data?.login?.success ?: 'Login successful'}]]",
                 setError() {
                     this.error = true;
+                    this.loading = false;
+                    this.disabled = false;
+                },
+                setSuccess() {
+                    this.error = false;
                     this.loading = false;
                     this.disabled = false;
                 },
@@ -105,19 +110,19 @@
                                                     },
                                                 }).then(response => {
                                                     if (!response.ok) {
+                                                        this.setError();
                                                         this.monday.execute("notice", {
                                                            message: this.loginError,
                                                            type: "error",
                                                            timeout: 10000,
                                                         });
-                                                        throw new Error('Could not persist user credentials');
                                                     } else {
+                                                        this.setSuccess();
                                                         this.monday.execute("notice", {
                                                            message: this.loginSuccess,
                                                            type: "success",
                                                            timeout: 10000,
                                                         });
-                                                        location.reload();
                                                     }
                                                 }).catch(error => {
                                                     this.setError();

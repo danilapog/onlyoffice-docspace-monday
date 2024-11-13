@@ -63,7 +63,7 @@ public class SettingsController {
               .hash(encryptionService.encrypt(body.getDocSpaceHash()))
               .build());
 
-      return ResponseEntity.status(HttpStatus.OK).build();
+      return ResponseEntity.status(HttpStatus.OK).header("HX-Refresh", "true").build();
     } finally {
       MDC.clear();
     }
@@ -98,7 +98,7 @@ public class SettingsController {
       messagePublisher.accept(TenantChanged.builder().tenantId(user.getAccountId()).build());
       log.debug("Tenant changed notification has been sent");
 
-      return ResponseEntity.ok().build();
+      return ResponseEntity.ok().header("HX-Refresh", "true").build();
     } finally {
       MDC.clear();
     }

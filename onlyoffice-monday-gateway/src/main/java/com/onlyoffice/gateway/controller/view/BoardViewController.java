@@ -7,9 +7,7 @@ import com.onlyoffice.common.user.transfer.response.UserCredentials;
 import com.onlyoffice.gateway.client.TenantServiceClient;
 import com.onlyoffice.gateway.client.UserServiceClient;
 import com.onlyoffice.gateway.configuration.i18n.MessageSourceService;
-import com.onlyoffice.gateway.controller.view.model.ErrorPageModel;
-import com.onlyoffice.gateway.controller.view.model.LoginModel;
-import com.onlyoffice.gateway.controller.view.model.PageRendererWrapper;
+import com.onlyoffice.gateway.controller.view.model.*;
 import com.onlyoffice.gateway.controller.view.model.board.BoardAdminConfigureModel;
 import com.onlyoffice.gateway.controller.view.model.board.BoardCreateRoomModel;
 import com.onlyoffice.gateway.controller.view.model.board.DocSpaceBoardModel;
@@ -33,6 +31,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 @Slf4j
@@ -46,7 +45,6 @@ public class BoardViewController implements InitializingBean, DisposableBean {
   private final ExecutorService executor =
       ContextExecutorService.wrap(
           Executors.newVirtualThreadPerTaskExecutor(), ContextSnapshotFactory.builder().build());
-
   private final MeterRegistry meterRegistry;
   private final MessageSourceService messageService;
   private final EncryptionService encryptionService;
@@ -54,8 +52,7 @@ public class BoardViewController implements InitializingBean, DisposableBean {
   private final UserServiceClient userService;
   private Counter counter;
 
-  @Override
-  public void afterPropertiesSet() throws Exception {
+  public void afterPropertiesSet() {
     counter =
         Counter.builder("docs.rendered.request")
             .description("Number of times docSpace has been rendered")
@@ -66,61 +63,82 @@ public class BoardViewController implements InitializingBean, DisposableBean {
   public ModelAndView renderBoard(
       @RequestParam("boardId") int boardId,
       @AuthenticationPrincipal MondayAuthenticationPrincipal user) {
-    var userFuture =
-        CompletableFuture.supplyAsync(
-                () -> userService.findUser(user.getAccountId(), user.getUserId()), executor)
-            .thenApply(
-                res -> {
-                  if (res.getBody() != null)
-                    res.getBody().setHash(encryptionService.decrypt(res.getBody().getHash()));
-                  return res;
-                });
-    var tenantFuture =
-        CompletableFuture.supplyAsync(
-            () -> tenantService.findTenant(user.getAccountId()), executor);
-    var boardFuture =
-        CompletableFuture.supplyAsync(() -> tenantService.findBoard(boardId), executor);
+    return getBoardView(boardId, user, false);
+  }
 
+  @GetMapping("/refresh")
+  @ResponseBody
+  public ModelAndView refreshBoard(
+      @RequestParam("boardId") int boardId,
+      @AuthenticationPrincipal MondayAuthenticationPrincipal user) {
+    return getBoardView(boardId, user, true);
+  }
+
+  private ModelAndView getBoardView(
+      int boardId, MondayAuthenticationPrincipal user, boolean partial) {
     try {
-      CompletableFuture.allOf(userFuture, tenantFuture, boardFuture);
-      var userResponse = userFuture.join();
-      var tenantResponse = tenantFuture.join();
-      var boardResponse = boardFuture.join();
+      var userCredentials = getUserCredentials(user);
+      var tenantCredentials = getTenantCredentials(user);
+      var boardInformation = getBoardInformation(boardId);
 
-      var userCredentials = userResponse.getBody();
-      var tenantCredentials = tenantResponse.getBody();
-      if (!tenantResponse.getStatusCode().is2xxSuccessful() || tenantCredentials == null) {
-        log.debug("Rendering tenant not found page");
-        return handleTenantNotFound(user);
+      if (tenantCredentials == null) {
+        return handleTenantNotFound(user, partial);
       }
 
-      if (!boardResponse.getStatusCode().is2xxSuccessful() || boardResponse.getBody() == null) {
-        log.debug("Rendering no room page");
+      if (boardInformation == null) {
         return user.isAdmin()
-            ? renderCreateRoomView(userCredentials, tenantCredentials)
-            : renderErrorView(tenantCredentials, userCredentials);
+            ? renderCreateRoomView(userCredentials, tenantCredentials, partial)
+            : renderErrorView(tenantCredentials, userCredentials, partial);
       }
 
       counter.increment();
-      return renderDocSpaceBoardView(tenantCredentials, userCredentials, boardResponse.getBody());
+      return renderDocSpaceBoardView(tenantCredentials, userCredentials, boardInformation, partial);
     } catch (RuntimeException e) {
       log.error("Could not render board page", e);
-      return handleTenantNotFound(user);
+      return handleTenantNotFound(user, partial);
     }
   }
 
-  private ModelAndView handleTenantNotFound(MondayAuthenticationPrincipal user) {
+  private UserCredentials getUserCredentials(MondayAuthenticationPrincipal user) {
+    return CompletableFuture.supplyAsync(
+            () -> userService.findUser(user.getAccountId(), user.getUserId()), executor)
+        .thenApply(
+            response -> {
+              if (response.getBody() != null) {
+                response.getBody().setHash(encryptionService.decrypt(response.getBody().getHash()));
+              }
+              return response.getBody();
+            })
+        .join();
+  }
+
+  private TenantCredentials getTenantCredentials(MondayAuthenticationPrincipal user) {
+    return CompletableFuture.supplyAsync(
+            () -> tenantService.findTenant(user.getAccountId()), executor)
+        .join()
+        .getBody();
+  }
+
+  private BoardInformation getBoardInformation(int boardId) {
+    return CompletableFuture.supplyAsync(() -> tenantService.findBoard(boardId), executor)
+        .join()
+        .getBody();
+  }
+
+  private ModelAndView handleTenantNotFound(MondayAuthenticationPrincipal user, boolean partial) {
     return user.isAdmin()
-        ? renderAdminConfigureView(user)
+        ? renderAdminConfigureView(user, partial)
         : renderSimpleErrorView(
-            "pages.errors.configuration.header",
-            "pages.errors.configuration.subtext",
-            TemplateLocation.NOT_CONFIGURED_ERROR.getPath());
+            messageService.getMessage("pages.errors.configuration.header"),
+            messageService.getMessage("pages.errors.configuration.subtext"),
+            TemplateLocation.NOT_CONFIGURED_ERROR.getPath(),
+            partial);
   }
 
   private ModelAndView renderCreateRoomView(
-      UserCredentials userCredentials, TenantCredentials tenantCredentials) {
+      UserCredentials userCredentials, TenantCredentials tenantCredentials, boolean partial) {
     return renderView(
+        partial,
         "pages/board/create",
         BoardCreateRoomModel.builder()
             .login(buildLoginModel(tenantCredentials, userCredentials))
@@ -139,8 +157,10 @@ public class BoardViewController implements InitializingBean, DisposableBean {
   private ModelAndView renderDocSpaceBoardView(
       TenantCredentials tenantCredentials,
       UserCredentials userCredentials,
-      BoardInformation boardInformation) {
+      BoardInformation boardInformation,
+      boolean partial) {
     return renderView(
+        partial,
         "pages/board/docspace",
         DocSpaceBoardModel.builder()
             .login(buildLoginModel(tenantCredentials, userCredentials))
@@ -155,9 +175,9 @@ public class BoardViewController implements InitializingBean, DisposableBean {
             .build());
   }
 
-  private ModelAndView renderAdminConfigureView(MondayAuthenticationPrincipal user) {
-    return renderView(
-        TemplateLocation.BOARD_ADMIN_CONFIGURE.getPath(),
+  private ModelAndView renderAdminConfigureView(
+      MondayAuthenticationPrincipal user, boolean partial) {
+    var model =
         BoardAdminConfigureModel.builder()
             .settingsForm(buildSettingsLoginFormModel())
             .login(
@@ -169,22 +189,52 @@ public class BoardViewController implements InitializingBean, DisposableBean {
                     .success(messageService.getMessage("pages.settings.configure.login.success"))
                     .build())
             .information(buildSettingsConfigureInformationModel(user))
-            .build());
+            .build();
+
+    return renderView(partial, TemplateLocation.BOARD_ADMIN_CONFIGURE.getPath(), model);
   }
 
   private ModelAndView renderErrorView(
-      TenantCredentials tenantCredentials, UserCredentials userCredentials) {
+      TenantCredentials tenantCredentials, UserCredentials userCredentials, boolean partial) {
     return renderView(
+        partial,
         TemplateLocation.NO_ROOM_ERROR.getPath(),
         ErrorPageModel.builder()
+            .refresh("/views/refresh")
             .login(buildLoginModel(tenantCredentials, userCredentials))
-            .error(buildErrorTextModel("pages.errors.room.header", "pages.errors.room.subtext"))
+            .error(
+                ErrorPageModel.ErrorText.builder()
+                    .header(messageService.getMessage("pages.errors.room.header"))
+                    .subtext(messageService.getMessage("pages.errors.room.subtext"))
+                    .build())
             .build());
   }
 
-  private ModelAndView renderSimpleErrorView(String headerKey, String subtextKey, String path) {
+  private ModelAndView renderSimpleErrorView(
+      String header, String subtext, String path, boolean partial) {
     return renderView(
-        path, ErrorPageModel.builder().error(buildErrorTextModel(headerKey, subtextKey)).build());
+        partial,
+        path,
+        ErrorPageModel.builder()
+            .refresh("/views/refresh")
+            .error(ErrorPageModel.ErrorText.builder().header(header).subtext(subtext).build())
+            .build());
+  }
+
+  private <T> ModelAndView renderView(boolean partial, String location, T data) {
+    return partial ? renderPartialView(location, data) : renderFullView(location, data);
+  }
+
+  private <T> ModelAndView renderFullView(String location, T data) {
+    return new ModelAndView(
+        "pages/root",
+        "page",
+        PageRendererWrapper.<T>builder().location(location).data(data).build());
+  }
+
+  private <T> ModelAndView renderPartialView(String location, T data) {
+    return new ModelAndView(
+        location, "page", PageRendererWrapper.builder().location(location).data(data).build());
   }
 
   private LoginModel buildLoginModel(
@@ -195,13 +245,6 @@ public class BoardViewController implements InitializingBean, DisposableBean {
         .hash(userCredentials != null ? userCredentials.getHash() : "")
         .success(messageService.getMessage("pages.settings.configure.login.success"))
         .error(messageService.getMessage("pages.settings.configure.login.error"))
-        .build();
-  }
-
-  private ErrorPageModel.ErrorText buildErrorTextModel(String headerKey, String subtextKey) {
-    return ErrorPageModel.ErrorText.builder()
-        .header(messageService.getMessage(headerKey))
-        .subtext(messageService.getMessage(subtextKey))
         .build();
   }
 
@@ -236,13 +279,6 @@ public class BoardViewController implements InitializingBean, DisposableBean {
         .app(messageService.getMessage("pages.settings.configure.information.app"))
         .appAddress(selfOrigin)
         .build();
-  }
-
-  private <T> ModelAndView renderView(String location, T data) {
-    return new ModelAndView(
-        "pages/root",
-        "page",
-        PageRendererWrapper.<T>builder().location(location).data(data).build());
   }
 
   public void destroy() {

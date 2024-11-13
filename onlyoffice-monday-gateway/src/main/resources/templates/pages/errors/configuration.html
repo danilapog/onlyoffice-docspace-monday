@@ -8,18 +8,21 @@
     <script>
         function configurationErrorData() {
             return {
+                socketHandler: async (evt) => {
+                    try {
+                        const refresh = '[[${page?.data?.refresh}]]';
+                        const data = (await mondaySdk().get("context")).data;
+                        const msg = JSON.parse(evt.detail.message);
+                        if (msg && msg['tenant_id'] == data?.account?.id)
+                            htmx.ajax('GET', `${refresh}?boardId=${data?.boardId}`, { target: '#content', swap: 'innerHTML' });
+                    } catch(err) {
+                        console.error(err);
+                    }
+                },
                 async init() {
-                    const data = (await mondaySdk().get("context")).data;
-                    htmx.on('htmx:wsBeforeMessage', (evt) => {
-                        try {
-                            const msg = JSON.parse(evt.detail.message);
-                            if (msg && msg['tenant_id'] == data?.account?.id) {
-                                htmx.ajax('GET', `/views?boardId=${data.boardId}`, { target: '#content', swap: 'outerHTML' });
-                                return;
-                            }
-                        } catch(err) {
-                            return;
-                        }
+                    htmx.on('htmx:wsBeforeMessage', this.socketHandler);
+                    htmx.on('htmx:beforeSwap', (evt) => {
+                        htmx.off('htmx:wsBeforeMessage', this.socketHandler);
                     });
                 }
             }
@@ -29,8 +32,6 @@
     <div th:replace="~{atoms/logo/svg/horizontal}"></div>
     <div th:replace="~{atoms/logo/svg/owl}"></div>
     <x-error-text
-            x-data="webSocketConfiguration"
-            hx-ext="ws"
             th:header="${page?.data?.error?.header} ?: 'Please wait'"
             th:subtext="${page?.data?.error?.subtext} ?: 'Monday Administrator or Monday Member have to configure plugin first'"
     ></x-error-text>
