@@ -59,6 +59,7 @@
                 url: "[[${page?.data?.login?.url}]]",
                 email: "",
                 password: "",
+                docsError: "[[${page?.data?.login?.docsError}]]",
                 loginError: "[[${page?.data?.login?.error ?: 'Login failed'}]]",
                 loginSuccess: "[[${page?.data?.login?.success ?: 'Login successful'}]]",
                 setError() {
@@ -71,77 +72,91 @@
                     this.loading = false;
                     this.disabled = false;
                 },
+                setDocSpaceReady() {
+                    this.disabled = false;
+                },
                 toggleSubmit() {
                     this.disabled = true;
                     this.loading = true;
                 },
                 init() {
-                    this.monday = mondaySdk();
-                    htmx.on('htmx:beforeRequest', async (evt) => {
-                        if (evt.detail.pathInfo.finalRequestPath !== this.path) {
-                            return;
+                    const timeout = setTimeout(async () => {
+                        this.setError();
+                        await mondaySdk().execute("notice", {
+                            message: this.docsError,
+                            type: "error",
+                            timeout: 10000,
+                        });
+                    }, 6500);
+
+                    const docSpace = window.DocSpace.SDK.initSystem({
+                        src: this.url,
+                        frameId: 'ds-frame',
+                        events: {
+                            onAppReady: async () => {
+                                clearTimeout(timeout);
+                                this.setDocSpaceReady();
+                            },
+                            onAppError: async () => {
+                                this.setError();
+                                await mondaySdk().execute("notice", {
+                                    message: this.docsError,
+                                    type: "error",
+                                    timeout: 10000,
+                                });
+                            },
                         }
+                    });
+
+                    Alpine.store('htmxEventManager').addListener("htmx:beforeRequest", async (evt) => {
+                        if (evt.detail.pathInfo.finalRequestPath !== this.path) return;
 
                         evt.preventDefault();
                         try {
-                            const timeout = setTimeout(() => this.setError(), 6500);
-                            const frame = window.DocSpace.SDK.initSystem({
-                                src: this.url,
-                                frameId: 'ds-frame',
-                                events: {
-                                    onAppReady: async () => {
-                                        try {
-                                            clearTimeout(timeout);
-                                            const settings = await DocSpace.SDK.frames['ds-frame'].getHashSettings();
-                                            const hash = await DocSpace.SDK.frames['ds-frame'].createHash(this.password, settings);
-                                            const login = await DocSpace.SDK.frames['ds-frame'].login(this.email, hash);
-                                            const me = await DocSpace.SDK.frames['ds-frame'].getUserInfo();
-                                            if (login && login.url) {
-                                                fetch(this.path, {
-                                                    method: 'POST',
-                                                    body: JSON.stringify({
-                                                        "docspace_user_id": me.id,
-                                                        "docspace_email": this.email,
-                                                        "docspace_hash": hash,
-                                                    }),
-                                                    headers: {
-                                                        ...evt.detail.requestConfig.headers,
-                                                        'Content-Type': 'application/json',
-                                                    },
-                                                }).then(response => {
-                                                    if (!response.ok) {
-                                                        this.setError();
-                                                        this.monday.execute("notice", {
-                                                           message: this.loginError,
-                                                           type: "error",
-                                                           timeout: 10000,
-                                                        });
-                                                    } else {
-                                                        this.setSuccess();
-                                                        this.monday.execute("notice", {
-                                                           message: this.loginSuccess,
-                                                           type: "success",
-                                                           timeout: 10000,
-                                                        });
-                                                    }
-                                                }).catch(error => {
-                                                    this.setError();
-                                                });
-                                            } else {
-                                                this.setError();
-                                            }
-                                        } catch (error) {
-                                            this.setError();
-                                        } finally {
-                                            await DocSpace.SDK.frames['ds-frame'].destroyFrame();
-                                        }
+                            const monday = mondaySdk();
+                            const settings = await docSpace.getHashSettings();
+                            const hash = await docSpace.createHash(this.password, settings);
+                            const login = await docSpace.login(this.email, hash);
+                            const me = await docSpace.getUserInfo();
+
+                            if (login && login.url) {
+                                const response = await fetch(this.path, {
+                                    method: 'POST',
+                                    body: JSON.stringify({
+                                        "docspace_user_id": me.id,
+                                        "docspace_email": this.email,
+                                        "docspace_hash": hash,
+                                    }),
+                                    headers: {
+                                        ...evt.detail.requestConfig.headers,
+                                        'Content-Type': 'application/json',
                                     },
-                                    onAppError: (error) => this.setError()
+                                });
+
+                                if (!response.ok) {
+                                    this.setError();
+                                    await monday.execute("notice", {
+                                        message: this.loginError,
+                                        type: "error",
+                                        timeout: 10000,
+                                    });
+                                } else {
+                                    this.setSuccess();
+                                    await monday.execute("notice", {
+                                        message: this.loginSuccess,
+                                        type: "success",
+                                        timeout: 10000,
+                                    });
                                 }
-                            });
+                            } else {
+                                this.setError();
+                            }
                         } catch {
                             this.setError();
                         }
+                    });
+                    Alpine.store('htmxEventManager').addListener('htmx:beforeSwap', () => {
+                        Alpine.store('htmxEventManager').removeAllListeners();
                     });
                 },
             }
