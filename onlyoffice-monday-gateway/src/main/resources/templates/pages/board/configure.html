@@ -49,9 +49,9 @@
                 async init() {
                     this.monday = mondaySdk();
                     const data = (await this.monday.get("context")).data;
-                    htmx.on('htmx:wsBeforeMessage', this.socketHandler);
-                    htmx.on('htmx:beforeSwap', (evt) => {
-                        htmx.off('htmx:wsBeforeMessage', this.socketHandler);
+                    Alpine.store('htmxEventManager').addListener("htmx:wsBeforeMessage", this.socketHandler);
+                    Alpine.store('htmxEventManager').addListener('htmx:beforeSwap', (evt) => {
+                        Alpine.store('htmxEventManager').removeAllListeners();
                     });
                     htmx.on('htmx:beforeRequest', async (evt) => {
                         if (evt.detail.pathInfo.finalRequestPath !== this.path) {

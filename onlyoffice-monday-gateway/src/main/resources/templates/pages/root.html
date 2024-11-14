@@ -34,7 +34,7 @@
                                         try {
                                             await DocSpace.SDK.frames['root-ds'].login(this.persistedEmail, this.persistedHash);
                                         } catch (error) {
-                                             this.monday.execute("notice", {
+                                             await mondaySdk().execute("notice", {
                                                 message: this.loginError,
                                                 type: "error",
                                                 timeout: 10000,
@@ -45,7 +45,7 @@
                                         }
                                     },
                                     onAppError: (error) => {
-                                        this.monday.execute("notice", {
+                                        mondaySdk().execute("notice", {
                                             message: this.loginError,
                                             type: "error",
                                             timeout: 10000,
@@ -71,12 +71,35 @@
                     });
                 }
             });
+            Alpine.store('htmxEventManager', {
+                listeners: [],
+                addListener(event, handler) {
+                    htmx.on(event, handler);
+                    this.listeners.push({ event, handler });
+                },
+                removeListener(event, handler) {
+                    htmx.off(event, handler);
+                    this.listeners = this.listeners.filter(
+                        (listener) => listener.event !== event || listener.handler !== handler
+                    );
+                },
+                removeAllListeners() {
+                    this.listeners.forEach(({ event, handler }) => {
+                        htmx.off(event, handler);
+                    });
+                    this.listeners = [];
+                },
+            });
         });
     </script>
 </head>
 <body class="h-screen w-screen overflow-x-hidden" x-data="root">
+    <div th:replace="~{atoms/loader/spinner}"></div>
     <div style="display: none;">
         <div id="root-ds"></div>
+    </div>
+    <div x-show="!rootReady" class="h-full w-full flex justify-center items-center">
+        <x-basic-spinner classes="w-16 h-16"></x-basic-spinner>
     </div>
     <section id="content" x-show="rootReady" x-cloak class="h-full w-full" x-data="webSocketConfiguration" hx-ext="ws">
         <div th:replace="~{__${page.location}__}"></div>

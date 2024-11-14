@@ -20,10 +20,7 @@
                     }
                 },
                 async init() {
-                    htmx.on('htmx:wsBeforeMessage', this.socketHandler);
-                    htmx.on('htmx:beforeSwap', (evt) => {
-                        htmx.off('htmx:wsBeforeMessage', this.socketHandler);
-                    });
+                    Alpine.store('htmxEventManager').addListener("htmx:wsBeforeMessage", this.socketHandler);
                 },
             }
         }
