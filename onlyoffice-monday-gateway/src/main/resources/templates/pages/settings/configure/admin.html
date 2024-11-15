@@ -72,14 +72,14 @@
                             });
 
                             if (!response.ok) {
-                                monday.execute("notice", {
+                                await monday.execute("notice", {
                                     message: '[[${page?.data?.login?.error ?: "Login failed"}]]',
                                     type: "error",
                                     timeout: 10000,
                                 });
                                 throw new Error('Could not persist user credentials');
                             } else {
-                                monday.execute("notice", {
+                                await monday.execute("notice", {
                                     message: '[[${page?.data?.login?.success ?: "Login successful"}]]',
                                     type: "success",
                                     timeout: 10000,

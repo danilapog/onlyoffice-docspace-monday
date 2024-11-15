@@ -42,9 +42,8 @@
                         const monday = mondaySdk();
                         const data = (await monday.get("context")).data;
                         const msg = JSON.parse(evt.detail.message);
-                        if (msg && msg['tenant_id'] == data?.account?.id) {
+                        if (msg && msg['tenant_id'] == data?.account?.id)
                             htmx.ajax('GET', `/views/refresh?boardId=${data?.boardId}`, { target: '#content', swap: 'innerHTML' });
-                        }
                     } catch (err) {
                         console.log(err);
                     }
@@ -74,14 +73,14 @@
                             });
 
                             if (!response.ok) {
-                                monday.execute("notice", {
+                                await monday.execute("notice", {
                                     message: '[[${page?.data?.login?.error ?: "Login failed"}]]',
                                     type: "error",
                                     timeout: 10000,
                                 });
                                 throw new Error('Could not persist user credentials');
                             } else {
-                                monday.execute("notice", {
+                                await monday.execute("notice", {
                                     message: '[[${page?.data?.login?.success ?: "Login successful"}]]',
                                     type: "success",
                                     timeout: 10000,
