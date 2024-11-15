@@ -24,7 +24,22 @@
                 persistedEmail: '[[${page?.data?.login?.email}]]',
                 persistedHash: '[[${page?.data?.login?.hash}]]',
                 loginError: '[[${page?.data?.login?.error}]]',
-                init() {
+                fetchTranslated: async () => {
+                    const monday = mondaySdk();
+                    const { appFeature, boardId, user } = (await monday.get("context")).data;
+                    let path = `/views/refresh?boardId=${boardId}`;
+                    if (appFeature.type === "AppFeatureAccountSettingsView")
+                        path = `/views/settings/refresh`;
+                    await htmx.ajax('GET', path, {
+                        target: '#content',
+                        swap: 'innerHTML',
+                        headers: {
+                            'Accept-Language': user.currentLanguage,
+                        }
+                    });
+                },
+                async init() {
+                    await this.fetchTranslated();
                     if (this.persistedUrl && this.persistedEmail && this.persistedHash) {
                             window.DocSpace.SDK.initSystem({
                                 src: this.persistedUrl,
@@ -59,20 +74,21 @@
                     }
                 }
             }));
-            Alpine.store("darkMode", {
-                on: false,
-                toggle() {
-                    this.on = ! this.on
-                },
+            Alpine.store("profile", {
+                lang: "en",
+                dark: false,
                 async init() {
                     mondaySdk().listen("context", (ctx) => {
-                        const { theme } = ctx.data;
-                        this.on = theme !== 'light';
+                        const { theme, user } = ctx.data;
+                        this.dark = theme !== 'light';
+                        if (user.currentLanguage != this.lang)
+                            this.lang = user.currentLanguage;
                     });
-                }
+                },
             });
             Alpine.store('htmxEventManager', {
                 listeners: [],
+                namedListeners: new Map(),
                 addListener(event, handler) {
                     htmx.on(event, handler);
                     this.listeners.push({ event, handler });
@@ -83,12 +99,37 @@
                         (listener) => listener.event !== event || listener.handler !== handler
                     );
                 },
+                addNamedListener(name, event, handler) {
+                    if (this.namedListeners.has(name))
+                        return;
+                    htmx.on(event, handler);
+                    this.namedListeners.set(name, { event, handler });
+                },
+                removeNamedListener(name) {
+                    const listener = this.namedListeners.get(name);
+                    if (listener) {
+                        htmx.off(listener.event, listener.handler);
+                        this.namedListeners.delete(name);
+                    } else {
+                        console.warn(`No listener found with name "${name}".`);
+                    }
+                },
                 removeAllListeners() {
                     this.listeners.forEach(({ event, handler }) => {
                         htmx.off(event, handler);
                     });
                     this.listeners = [];
                 },
+                removeAllNamedListeners() {
+                    this.namedListeners.forEach(({ event, handler }, name) => {
+                        htmx.off(event, handler);
+                    });
+                    this.namedListeners.clear();
+                },
+                clearAllListeners() {
+                    this.removeAllListeners();
+                    this.removeAllNamedListeners();
+                }
             });
         });
     </script>
@@ -102,7 +143,6 @@
         <x-basic-spinner classes="w-16 h-16"></x-basic-spinner>
     </div>
     <section id="content" x-show="rootReady" x-cloak class="h-full w-full" x-data="webSocketConfiguration" hx-ext="ws">
-        <div th:replace="~{__${page.location}__}"></div>
     </section>
 </body>
 <script>
@@ -127,6 +167,15 @@
         }
     });
     initComponents();
+    const setAcceptLanguageHeader = (event) => {
+        const lang = Alpine.store('profile').lang || navigator.language || 'en';
+        event.detail.headers['Accept-Language'] = lang;
+    };
     htmx.on('htmx:load', () => initComponents());
+    htmx.on('htmx:configRequest', setAcceptLanguageHeader);
+    window.addEventListener('beforeunload', () => {
+        htmx.off('htmx:configRequest', setAcceptLanguageHeader);
+        Alpine.store('htmxEventManager').clearAllListeners();
+    });
 </script>
 </html>

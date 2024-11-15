@@ -17,7 +17,7 @@
             class="font-bold py-2 px-4 rounded-md w-full focus:outline-none focus:ring-0
                    disabled:hover:shadow-none disabled:cursor-not-allowed"
             :class="[
-                $store?.darkMode?.on ? 'bg-login-blue text-white disabled:bg-gray-400' : 'bg-login-blue text-white disabled:bg-gray-300',
+                $store?.profile?.dark ? 'bg-login-blue text-white disabled:bg-gray-400' : 'bg-login-blue text-white disabled:bg-gray-300',
                 classes
             ]"
             style="height: 44px"

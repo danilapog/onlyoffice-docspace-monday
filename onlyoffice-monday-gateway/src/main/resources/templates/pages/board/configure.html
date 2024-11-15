@@ -145,7 +145,7 @@
             </div>
             <form class="p-6 md:p-8 rounded-lg shadow-lg w-[384px] flex-shrink-0"
                   :class="[
-                      $store?.darkMode?.on ? 'bg-background-dark' : 'bg-white'
+                      $store?.profile?.dark ? 'bg-background-dark' : 'bg-white'
                   ]"
                   @submit="toggleSubmit"
                   :hx-post="path"

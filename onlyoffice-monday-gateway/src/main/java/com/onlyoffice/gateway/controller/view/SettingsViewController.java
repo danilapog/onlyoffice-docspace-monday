@@ -42,8 +42,7 @@ public class SettingsViewController {
   @GetMapping("/change")
   public ModelAndView renderChange(@AuthenticationPrincipal MondayAuthenticationPrincipal user) {
     log.debug("Rendering change page");
-    return renderPartialView(
-        TemplateLocation.ADMIN_CONFIGURE.getPath(), buildAdminConfigureModel(user.getSlug()));
+    return renderAdminConfigureView(user.getSlug(), true);
   }
 
   @GetMapping("/refresh")
@@ -154,7 +153,6 @@ public class SettingsViewController {
         .addressText(docSpaceAddress)
         .error(messageService.getMessage("pages.settings.configure.login.error"))
         .success(messageService.getMessage("pages.settings.configure.login.success"))
-        .docsError(messageService.getMessage("pages.settings.configure.login.docsError"))
         .build();
   }
 

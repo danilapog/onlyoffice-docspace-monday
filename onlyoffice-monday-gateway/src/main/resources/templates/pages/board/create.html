@@ -161,7 +161,7 @@
                     classes="font-sans"
                     th:data-text="${page?.data?.creationInformation?.welcomeText} ?: 'Welcome to DocSpace Board!'"
                     :class="[
-                        $store?.darkMode?.on ? 'text-white' : ''
+                        $store?.profile?.dark ? 'text-white' : ''
                     ]"
             ></x-bold-text>
         </div>

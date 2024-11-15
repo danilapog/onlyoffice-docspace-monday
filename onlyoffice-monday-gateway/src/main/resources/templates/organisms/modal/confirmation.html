@@ -1,15 +1,14 @@
 <template x-component="confirmation-modal">
     <div x-data="{ ...{
                 modalOpened: false,
-                url: '/views/settings/change',
-                target: '#content',
-                swap: 'innerHTML',
                 disabled: false,
                 close() {
                     this.modalOpened = false;
                 },
-                disable() {
+                change() {
                     this.disabled = true;
+                    htmx.ajax('GET', `/views/settings/change`, { target: '#content', swap: 'innerHTML' });
+                    this.disabled = false;
                 },
                 init() {
                     this.disabled = false;
@@ -31,7 +30,7 @@
         <div
             class="shadow-lg rounded-lg overflow-hidden w-full max-w-lg mx-auto"
             :class="[
-                $store?.darkMode?.on ? 'bg-gray-900' : 'bg-white'
+                $store?.profile?.dark ? 'bg-gray-900' : 'bg-white'
             ]"
         >
             <div class="h-14 flex items-center px-5">
@@ -40,7 +39,7 @@
                         th:data-text="${page?.data?.modal?.confirmActionText} ?: 'Confirm your action'"
                         classes="font-sans text-xl"
                         :class="[
-                            $store?.darkMode?.on ? 'text-white' : ''
+                            $store?.profile?.dark ? 'text-white' : ''
                         ]"
                     ></x-bold-text>
                 </div>
@@ -58,11 +57,7 @@
                 <div class="w-full mr-4">
                     <x-loader-button
                         x-model="{ disabled, loading: disabled }"
-                        @click="disable"
-                        :hx-get="url"
-                        hx-trigger="click"
-                        :hx-target="target"
-                        :hx-swap="swap"
+                        @click="change"
                         th:data-text="${page?.data?.modal?.changeText} ?: 'Change'"
                     ></x-loader-button>
                 </div>

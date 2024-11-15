@@ -10,7 +10,7 @@
             <p th:text="${page?.data?.information?.csp} ?: 'Check the CSP settings'"
                class="font-sans"
                :class="[
-                    $store?.darkMode?.on ? 'text-white' : ''
+                    $store?.profile?.dark ? 'text-white' : ''
                ]"
             ></p>
         </div>
@@ -19,8 +19,8 @@
                     th:text="${page?.data?.information?.credentials} ?: 'Before connecting the app, please go to the DocSpace Settings - Developer tools - JavaScript SDK and add the following credentials to the allow list:'"
                     class="font-sans"
                     :class="[
-                    $store?.darkMode?.on ? 'text-white' : ''
-                 ]"
+                        $store?.profile?.dark ? 'text-white' : ''
+                    ]"
             ></span>
             <br/>
             <br/>
@@ -29,8 +29,8 @@
                         th:text="${page?.data?.information?.monday} ?: 'Monday portal address:'"
                         class="font-sans"
                         :class="[
-                        $store?.darkMode?.on ? 'text-white' : ''
-                    ]"
+                            $store?.profile?.dark ? 'text-white' : ''
+                        ]"
                 ></span>
                 <span
                         th:text="${page?.data?.information?.mondayAddress} ?: 'monday.onlyoffice.com'"
@@ -43,8 +43,8 @@
                         th:text="${page?.data?.information?.app} ?: 'ONLYOFFICE DocSpace app:'"
                         class="font-sans"
                         :class="[
-                        $store?.darkMode?.on ? 'text-white' : ''
-                    ]"
+                            $store?.profile?.dark ? 'text-white' : ''
+                        ]"
                 ></span>
                 <span
                         th:text="${page?.data?.information?.appAddress} ?: 'monday.onlyoffice.com'"

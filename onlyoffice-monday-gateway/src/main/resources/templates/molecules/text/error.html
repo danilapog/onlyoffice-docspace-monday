@@ -11,7 +11,7 @@
                 class="mb-2 h-1/2 overflow-hidden text-ellipsis w-full"
                 classes="text-xl text-center line-clamp-2 font-sans"
                 :class="[
-                    $store?.darkMode?.on ? 'text-white' : ''
+                    $store?.profile?.dark ? 'text-white' : ''
                 ]"
                 :text="header"
         ></x-bold-text>

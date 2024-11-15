@@ -16,7 +16,7 @@
             :disabled="disabled"
             class="rounded-md h-10 w-full mr-2 hover:shadow-lg duration-300 disabled:hover:shadow-none disabled:cursor-not-allowed"
             :class="[
-                $store?.darkMode?.on ? 'bg-login-blue text-white disabled:bg-gray-400' : 'bg-login-blue text-white disabled:bg-gray-300',
+                $store?.profile?.dark ? 'bg-login-blue text-white disabled:bg-gray-400' : 'bg-login-blue text-white disabled:bg-gray-300',
                 classes
             ]"
     >

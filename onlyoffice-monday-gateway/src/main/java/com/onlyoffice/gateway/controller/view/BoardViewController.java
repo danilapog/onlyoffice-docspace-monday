@@ -187,8 +187,6 @@ public class BoardViewController implements InitializingBean, DisposableBean {
                     .addressText(user.getSlug())
                     .error(messageService.getMessage("pages.settings.configure.login.error"))
                     .success(messageService.getMessage("pages.settings.configure.login.success"))
-                    .docsError(
-                        messageService.getMessage("pages.settings.configure.login.docsError"))
                     .build())
             .information(buildSettingsConfigureInformationModel(user))
             .build();
@@ -247,7 +245,6 @@ public class BoardViewController implements InitializingBean, DisposableBean {
         .hash(userCredentials != null ? userCredentials.getHash() : "")
         .success(messageService.getMessage("pages.settings.configure.login.success"))
         .error(messageService.getMessage("pages.settings.configure.login.error"))
-        .docsError(messageService.getMessage("pages.settings.configure.login.docsError"))
         .build();
   }
 

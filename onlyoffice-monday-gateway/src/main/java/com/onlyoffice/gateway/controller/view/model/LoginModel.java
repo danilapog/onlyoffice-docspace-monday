@@ -15,5 +15,4 @@ public class LoginModel {
   @Builder.Default private String addressText = "docspace.server.info";
   @Builder.Default private String success = "Login successful";
   @Builder.Default private String error = "Login failed";
-  @Builder.Default private String docsError = "Could not initialize DocSpace";
 }

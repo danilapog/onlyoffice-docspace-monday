@@ -16,44 +16,6 @@
         <div th:replace="~{organisms/information/configuration}"></div>
         <div th:replace="~{organisms/modal/confirmation}"></div>
     </div>
-    <main x-data="loginAdminData" class="flex flex-col min-h-screen overflow-hidden" role="main">
-        <div style="display: none;">
-            <div id="ds-frame"></div>
-        </div>
-        <div class="w-full flex flex-col justify-center items-center py-8 overflow-y-auto no-scrollbar">
-            <div class="flex justify-center items-center mb-8">
-                <div class="mr-4" th:insert="~{atoms/logo/svg/monday}"></div>
-                <div th:insert="~{atoms/logo/svg/refresh}"></div>
-                <div class="ml-4" th:insert="~{atoms/logo/svg/onlyoffice}"></div>
-            </div>
-            <div class="mb-8" style="max-width: 384px; text-align: center">
-                <x-generic-text
-                        classes="font-sans"
-                        th:data-text="${page?.data?.login?.accessText} ?: 'Monday requests access to your ONLYOFFICE DocSpace'"
-                ></x-generic-text>
-                <x-bold-text
-                        classes="font-sans text-blue-500"
-                        th:data-text="${page?.data?.login?.addressText} ?: 'docspace.server.info'"
-                ></x-bold-text>
-            </div>
-            <form
-                 x-model="modal"
-                 x-modelable="confirmation"
-                 class="p-8 rounded-lg shadow-lg"
-                 :class="[
-                      $store?.darkMode?.on ? 'bg-background-dark' : 'bg-white'
-                 ]"
-                 style="width: 384px; transition: border-color 0.3s ease;"
-                 @submit="toggleSubmit"
-                 :hx-post="path"
-                 hx-swap="none"
-                 hx-trigger="submit"
-            >
-                <x-docspace-settings-form></x-docspace-settings-form>
-                <x-confirmation-modal></x-confirmation-modal>
-            </form>
-        </div>
-    </main>
     <script>
         function loginAdminData() {
             return {
@@ -68,7 +30,6 @@
                 url: "[[${page?.data?.login?.url}]]",
                 email: "",
                 password: "",
-                docsError: "[[${page?.data?.login?.docsError}]]",
                 loginError: "[[${page?.data?.login?.error}]]",
                 loginSuccess: "[[${page?.data?.login?.success}]]",
                 setError() {
@@ -94,11 +55,6 @@
                 init() {
                     const timeout = setTimeout(async () => {
                         this.setError();
-                        await mondaySdk().execute("notice", {
-                            message: this.docsError,
-                            type: "error",
-                            timeout: 10000,
-                        });
                     }, 6500);
 
                     const docSpace = window.DocSpace.SDK.initSystem({
@@ -108,15 +64,7 @@
                             onAppReady: async () => {
                                 clearTimeout(timeout);
                                 this.setDocSpaceReady();
-                            },
-                            onAppError: async () => {
-                                this.setError();
-                                await mondaySdk().execute("notice", {
-                                    message: this.docsError,
-                                    type: "error",
-                                    timeout: 10000,
-                                });
-                            },
+                            }
                         }
                     });
 
@@ -174,4 +122,47 @@
             }
         }
     </script>
+    <main x-data="loginAdminData" class="flex flex-col min-h-screen overflow-hidden" role="main">
+        <div style="display: none;">
+            <div id="ds-frame"></div>
+        </div>
+        <div class="w-full flex flex-col justify-center items-center py-8 overflow-y-auto no-scrollbar">
+            <div class="flex justify-center items-center mb-8">
+                <div class="mr-4" th:insert="~{atoms/logo/svg/monday}"></div>
+                <div th:insert="~{atoms/logo/svg/refresh}"></div>
+                <div class="ml-4" th:insert="~{atoms/logo/svg/onlyoffice}"></div>
+            </div>
+            <div class="mb-8" style="max-width: 384px; text-align: center">
+                <x-generic-text
+                        classes="font-sans"
+                        th:data-text="${page?.data?.login?.accessText} ?: 'Monday requests access to your ONLYOFFICE DocSpace'"
+                ></x-generic-text>
+                <x-bold-text
+                        classes="font-sans text-blue-500"
+                        th:data-text="${page?.data?.login?.addressText} ?: 'docspace.server.info'"
+                ></x-bold-text>
+            </div>
+            <form
+                 x-model="modal"
+                 x-modelable="confirmation"
+                 class="p-8 rounded-lg shadow-lg"
+                 :class="[
+                      $store?.profile?.dark ? 'bg-background-dark' : 'bg-white'
+                 ]"
+                 style="width: 384px; transition: border-color 0.3s ease;"
+                 @submit="toggleSubmit"
+                 :hx-post="path"
+                 hx-swap="none"
+                 hx-trigger="submit"
+            >
+                <x-docspace-settings-form></x-docspace-settings-form>
+                <x-confirmation-modal
+                        th:agreement-text="${page?.data?.modal?.agreementText}"
+                        th:confirm-text="${page?.data?.modal?.confirmActionText}"
+                        th:change-text="${page?.data?.modal?.changeText}"
+                        th:cancel-text="${page?.data?.modal?.cancelText}"
+                ></x-confirmation-modal>
+            </form>
+        </div>
+    </main>
 </div>

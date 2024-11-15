@@ -84,7 +84,7 @@
                             th:data-text="${page?.data?.docSpaceManager?.welcomeText} ?: 'Welcome to DocSpace'"
                             classes="font-sans"
                             :class="[
-                                $store?.darkMode?.on ? 'text-white' : ''
+                                $store?.profile?.dark ? 'text-white' : ''
                             ]"
                     ></x-bold-text>
                 </div>
