@@ -13,7 +13,6 @@
                 roomsQuotaError: '[[${page?.data?.roomsQuotaError}]]',
                 timeoutError: '[[${page?.data?.timeoutError}]]',
                 operationError: '[[${page?.data?.operationError}]]',
-                monday: null,
                 loading: false,
                 disabled: false,
                 onAppReadyProcessed: false,
@@ -27,6 +26,7 @@
                 },
                 createRoom() {
                     this.disable();
+                    const monday = mondaySdk();
                     const frame = window.DocSpace.SDK.initManager({
                         src: this.url,
                         frameId: 'ds-frame',
@@ -34,9 +34,9 @@
                             onAppReady: async () => {
                                 if (this.onAppReadyProcessed) return;
                                 this.onAppReadyProcessed = true;
-                                const context = await this.monday.get("context");
+                                const context = await monday.get("context");
                                 const docSpace = DocSpace.SDK.frames['ds-frame'];
-                                const boardResponse = await this.monday.api(`
+                                const boardResponse = await monday.api(`
                                     query {
                                         boards(ids: ${context.data.boardId}) {
                                             name
@@ -77,7 +77,7 @@
                                         if (roomResult?.value?.status == 402) {
                                             this.enable();
                                             this.onAppReadyProcessed = false;
-                                            await mondaySdk().execute("notice", {
+                                            await monday.execute("notice", {
                                                 message: this.roomsQuotaError,
                                                 type: "error",
                                                 timeout: 10000,
@@ -85,7 +85,7 @@
                                         } else {
                                             this.enable();
                                             this.onAppReadyProcessed = false;
-                                            await mondaySdk().execute("notice", {
+                                            await monday.execute("notice", {
                                                 message: this.operationError,
                                                 type: "error",
                                                 timeout: 10000,
@@ -109,7 +109,7 @@
                                     }).catch(async (error) => {
                                         this.enable();
                                         this.onAppReadyProcessed = false;
-                                        await mondaySdk().execute("notice", {
+                                        await monday.execute("notice", {
                                             message: this.operationError,
                                             type: "error",
                                             timeout: 10000,
@@ -118,7 +118,7 @@
                                 } catch (error) {
                                     this.enable();
                                     this.onAppReadyProcessed = false;
-                                    await mondaySdk().execute("notice", {
+                                    await monday.execute("notice", {
                                         message: this.timeoutError,
                                         type: "error",
                                         timeout: 10000,
@@ -132,7 +132,7 @@
                 },
                 socketHandler: async (evt) => {
                     try {
-                        const { boardId } = (await this.monday.get("context")).data;
+                        const { boardId } = (await mondaySdk().get("context")).data;
                         const msg = JSON.parse(evt.detail.message);
                         if (msg && msg.type == "room_created" && msg["board_id"] == boardId)
                             htmx.ajax('GET', `/views/refresh?boardId=${boardId}`, { target: '#content', swap: 'innerHTML' });
@@ -141,7 +141,6 @@
                     }
                 },
                 async init() {
-                    this.monday = mondaySdk();
                     Alpine.store('htmxEventManager').addListener("htmx:wsBeforeMessage", this.socketHandler);
                     Alpine.store('htmxEventManager').addListener('htmx:beforeSwap', (evt) => {
                         Alpine.store('htmxEventManager').removeAllListeners();

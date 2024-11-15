@@ -12,11 +12,12 @@
                 accessKey: '[[${page?.data?.docSpaceManager?.accessKey}]]',
                 loggedIn: true,
                 socketHandler: async (evt) => {
+                    const monday = mondaySdk();
                     const notification = '[[${page?.data?.docSpaceManager?.notificationText}]]';
-                    const { boardId } = (await mondaySdk().get("context")).data;
+                    const { boardId } = (await monday.get("context")).data;
                     const msg = JSON.parse(evt.detail.message);
                     if (msg && msg.type == "refresh_access_token" && msg["board_id"] == boardId)
-                        await mondaySdk().execute("notice", {
+                        await monday.execute("notice", {
                             message: notification,
                             type: "info",
                             timeout: 10000,
@@ -27,8 +28,7 @@
                     Alpine.store('htmxEventManager').addListener('htmx:beforeSwap', (evt) => {
                         Alpine.store('htmxEventManager').removeAllListeners();
                     });
-                    const res = await mondaySdk().get("context");
-                    const { theme } = res.data;
+                    const { theme } = (await mondaySdk().get("context")).data;
 
                     if (this.initialized) return;
 
