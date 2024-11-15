@@ -187,6 +187,8 @@ public class BoardViewController implements InitializingBean, DisposableBean {
                     .addressText(user.getSlug())
                     .error(messageService.getMessage("pages.settings.configure.login.error"))
                     .success(messageService.getMessage("pages.settings.configure.login.success"))
+                    .docsError(
+                        messageService.getMessage("pages.settings.configure.login.docsError"))
                     .build())
             .information(buildSettingsConfigureInformationModel(user))
             .build();
@@ -245,6 +247,7 @@ public class BoardViewController implements InitializingBean, DisposableBean {
         .hash(userCredentials != null ? userCredentials.getHash() : "")
         .success(messageService.getMessage("pages.settings.configure.login.success"))
         .error(messageService.getMessage("pages.settings.configure.login.error"))
+        .docsError(messageService.getMessage("pages.settings.configure.login.docsError"))
         .build();
   }
 
@@ -275,7 +278,7 @@ public class BoardViewController implements InitializingBean, DisposableBean {
         .csp(messageService.getMessage("pages.settings.configure.information.csp"))
         .credentials(messageService.getMessage("pages.settings.configure.information.credentials"))
         .monday(messageService.getMessage("pages.settings.configure.information.monday"))
-        .mondayAddress(String.format("https://%s", user.getSlug()))
+        .mondayAddress(String.format("https://%s.monday.com", user.getSlug()))
         .app(messageService.getMessage("pages.settings.configure.information.app"))
         .appAddress(selfOrigin)
         .build();

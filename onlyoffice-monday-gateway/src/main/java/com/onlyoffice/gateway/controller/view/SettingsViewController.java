@@ -154,6 +154,7 @@ public class SettingsViewController {
         .addressText(docSpaceAddress)
         .error(messageService.getMessage("pages.settings.configure.login.error"))
         .success(messageService.getMessage("pages.settings.configure.login.success"))
+        .docsError(messageService.getMessage("pages.settings.configure.login.docsError"))
         .build();
   }
 
