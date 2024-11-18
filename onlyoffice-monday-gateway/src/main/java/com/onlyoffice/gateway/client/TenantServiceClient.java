@@ -3,16 +3,14 @@ package com.onlyoffice.gateway.client;
 import com.onlyoffice.common.tenant.transfer.request.command.RegisterDocSpace;
 import com.onlyoffice.common.tenant.transfer.request.command.RegisterRoom;
 import com.onlyoffice.common.tenant.transfer.request.command.RegisterTenant;
+import com.onlyoffice.common.tenant.transfer.request.command.RemoveRoom;
 import com.onlyoffice.common.tenant.transfer.response.BoardInformation;
 import com.onlyoffice.common.tenant.transfer.response.TenantCredentials;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 // TODO: Distributed Caching in v2?
 @FeignClient(
@@ -39,6 +37,11 @@ public interface TenantServiceClient {
   @CircuitBreaker(name = "tenantServiceCircuitBreaker", fallbackMethod = "createRoomFallback")
   ResponseEntity<?> createRoom(@RequestBody RegisterRoom command);
 
+  @DeleteMapping("/tenants/boards/room")
+  @Retry(name = "tenantServiceCommandRetry")
+  @CircuitBreaker(name = "tenantServiceCircuitBreaker", fallbackMethod = "removeRoomFallback")
+  ResponseEntity<?> removeRoom(@RequestBody RemoveRoom command);
+
   @PostMapping("/tenants/docspace")
   @Retry(name = "tenantServiceCommandRetry")
   @CircuitBreaker(name = "tenantServiceCircuitBreaker", fallbackMethod = "updateDocSpaceFallback")
@@ -58,6 +61,10 @@ public interface TenantServiceClient {
   }
 
   default ResponseEntity<?> createRoomFallback(RegisterRoom command, Exception ex) {
+    return ResponseEntity.badRequest().build();
+  }
+
+  default ResponseEntity<?> removeRoomFallback(RemoveRoom command, Exception ex) {
     return ResponseEntity.badRequest().build();
   }
 

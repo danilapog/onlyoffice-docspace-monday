@@ -7,9 +7,12 @@
         function docspaceManager() {
             return {
                 initialized: false,
+                appReady: false,
+                contentReady: false,
                 url: '[[${page?.data?.login?.url}]]',
                 roomId: '[[${page?.data?.docSpaceManager?.roomId}]]',
                 accessKey: '[[${page?.data?.docSpaceManager?.accessKey}]]',
+                unlinkMessageText: '[[${page?.data?.docSpaceManager?.unlinkRoomText}]]',
                 loggedIn: true,
                 socketHandler: async (evt) => {
                     const monday = mondaySdk();
@@ -28,9 +31,11 @@
                     Alpine.store('htmxEventManager').addListener('htmx:beforeSwap', (evt) => {
                         Alpine.store('htmxEventManager').removeAllListeners();
                     });
-                    const { theme } = (await mondaySdk().get("context")).data;
 
                     if (this.initialized) return;
+
+                    const monday = mondaySdk();
+                    const { boardId, theme } = (await monday.get("context")).data;
 
                     window.DocSpace.SDK.initSystem({
                         src: this.url,
@@ -55,6 +60,25 @@
                                         theme: theme && theme === 'light' ? "Base" : "Dark",
                                         id: this.roomId,
                                         mode: this.accessKey ? "other" : "manager",
+                                        events: {
+                                            onAppReady: () => { this.appReady = true; },
+                                            onContentReady: async () => {
+                                                this.contentReady = true;
+                                                const staleRoom = this.contentReady && !this.appReady;
+                                                if (staleRoom) {
+                                                    const { data } = await monday.execute("confirm", {
+                                                       message: this.unlinkMessageText,
+                                                       excludeCancelButton: false
+                                                    });
+
+                                                    if (data.confirm)
+                                                        htmx.ajax('DELETE', `/api/1.0/rooms/${boardId}`, {
+                                                            target: 'body',
+                                                            swap: 'none',
+                                                        });
+                                                }
+                                            },
+                                        },
                                         ...(this.accessKey
                                             ? { rootPath: `/rooms/share?key=${this.accessKey}&folder=${this.roomId}&searchArea=3&page=1&sortby=DateAndTime&sortorder=descending` }
                                             : {})

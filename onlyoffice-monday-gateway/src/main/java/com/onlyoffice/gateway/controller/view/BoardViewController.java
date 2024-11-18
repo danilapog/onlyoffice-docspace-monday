@@ -171,6 +171,7 @@ public class BoardViewController implements InitializingBean, DisposableBean {
                     .notificationText(messageService.getMessage("pages.docSpace.notificationText"))
                     .welcomeText(messageService.getMessage("pages.docSpace.welcomeText"))
                     .notPublicText(messageService.getMessage("pages.docSpace.notPublicText"))
+                    .unlinkRoomText(messageService.getMessage("pages.docSpace.unlinkRoomText"))
                     .build())
             .build());
   }

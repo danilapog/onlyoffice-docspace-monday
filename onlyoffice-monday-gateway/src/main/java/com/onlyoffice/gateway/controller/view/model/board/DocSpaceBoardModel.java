@@ -29,5 +29,9 @@ public class DocSpaceBoardModel {
     @Builder.Default
     private String notPublicText =
         "Board room is not public yet. Please login or wait for it to become public";
+
+    @Builder.Default
+    private String unlinkRoomText =
+        "Apparently the room linked to your board is archived/removed. Do you want to unlink it?";
   }
 }
