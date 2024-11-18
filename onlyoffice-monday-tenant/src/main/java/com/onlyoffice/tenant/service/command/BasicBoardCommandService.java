@@ -6,6 +6,7 @@ import com.onlyoffice.common.CommandMessage;
 import com.onlyoffice.common.tenant.transfer.request.command.InviteRoomUsers;
 import com.onlyoffice.common.tenant.transfer.request.command.RefreshAccessKey;
 import com.onlyoffice.common.tenant.transfer.request.command.RegisterRoom;
+import com.onlyoffice.common.tenant.transfer.request.command.RemoveRoom;
 import com.onlyoffice.tenant.exception.OutboxSerializationException;
 import com.onlyoffice.tenant.persistence.entity.Board;
 import com.onlyoffice.tenant.persistence.entity.Outbox;
@@ -80,6 +81,18 @@ public class BasicBoardCommandService implements BoardCommandService {
     } catch (JsonProcessingException e) {
       log.error("Could not perform json serialization", e);
       throw new OutboxSerializationException(e);
+    } finally {
+      MDC.clear();
+    }
+  }
+
+  @Transactional(isolation = Isolation.REPEATABLE_READ, rollbackFor = Exception.class)
+  public void remove(RemoveRoom command) {
+    try {
+      MDC.put("tenant_id", String.valueOf(command.getTenantId()));
+      MDC.put("board_id", String.valueOf(command.getBoardId()));
+      log.info("Unlinking room from a board");
+      boardRepository.deleteById(command.getBoardId());
     } finally {
       MDC.clear();
     }

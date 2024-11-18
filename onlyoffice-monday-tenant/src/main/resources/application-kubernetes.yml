@@ -86,6 +86,8 @@ resilience4j:
         baseConfig: defaultCommand
       registerTenant:
         baseConfig: defaultCommand
+      removeRoom:
+        baseConfig: defaultCommand
 info:
   app:
     name: "onlyoffice-tenant"

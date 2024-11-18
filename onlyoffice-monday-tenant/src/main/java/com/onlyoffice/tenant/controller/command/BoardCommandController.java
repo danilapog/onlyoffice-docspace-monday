@@ -1,6 +1,7 @@
 package com.onlyoffice.tenant.controller.command;
 
 import com.onlyoffice.common.tenant.transfer.request.command.RegisterRoom;
+import com.onlyoffice.common.tenant.transfer.request.command.RemoveRoom;
 import com.onlyoffice.tenant.client.UserServiceClient;
 import com.onlyoffice.tenant.service.command.BoardCommandService;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
@@ -10,10 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 // TODO: Add Handlers with X-Timeout
 @Validated
@@ -35,5 +33,12 @@ public class BoardCommandController {
 
     commandService.register(command, users.getBody().getIds());
     return ResponseEntity.status(HttpStatus.CREATED).build();
+  }
+
+  @DeleteMapping("/room")
+  @RateLimiter(name = "removeRoom")
+  public ResponseEntity<?> deleteRoom(@RequestBody @Valid RemoveRoom command) {
+    commandService.remove(command);
+    return ResponseEntity.status(HttpStatus.OK).build();
   }
 }
