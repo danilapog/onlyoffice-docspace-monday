@@ -12,6 +12,8 @@
     </parent>
 
     <properties>
+        <docker.image.name>onlyoffice/onlyoffice-monday-gateway:latest</docker.image.name>
+        <docker.image.port>3030</docker.image.port>
         <frontend.maven.plugin.version>1.15.1</frontend.maven.plugin.version>
     </properties>
 
@@ -260,6 +262,24 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>${jib.plugin.version}</version>
+                <configuration>
+                    <from>
+                        <image>eclipse-temurin:21-jre</image>
+                    </from>
+                    <to>
+                        <image>${docker.image.name}</image>
+                    </to>
+                    <container>
+                        <ports>
+                            <port>${docker.image.port}</port>
+                        </ports>
+                    </container>
+                </configuration>
             </plugin>
         </plugins>
     </build>

@@ -4,22 +4,45 @@ metadata:
   name: onlyoffice-monday
 build:
   artifacts:
-    - image: onlyoffice-monday-user
-      context: onlyoffice-monday-user
-      docker:
-        dockerfile: onlyoffice-monday-user/Dockerfile
-    - image: onlyoffice-monday-tenant
-      context: onlyoffice-monday-tenant
-      docker:
-        dockerfile: onlyoffice-monday-tenant/Dockerfile
-    - image: onlyoffice-monday-notification
-      context: onlyoffice-monday-notification
-      docker:
-        dockerfile: onlyoffice-monday-notification/Dockerfile
     - image: onlyoffice-monday-gateway
-      context: onlyoffice-monday-gateway
-      docker:
-        dockerfile: onlyoffice-monday-gateway/Dockerfile
+      custom:
+        buildCommand: |
+          ./mvnw package -pl onlyoffice-monday-gateway -am -DskipTests && \
+          ./mvnw jib:dockerBuild -pl onlyoffice-monday-gateway -DskipTests -Djib.to.image=$IMAGE
+        dependencies:
+          paths:
+            - onlyoffice-monday-gateway/src
+            - onlyoffice-monday-gateway/pom.xml
+            - onlyoffice-monday-configuration/src
+            - onlyoffice-monday-configuration/pom.xml
+            - onlyoffice-monday-common/src
+            - onlyoffice-monday-common/pom.xml
+    - image: onlyoffice-monday-tenant
+      custom:
+        buildCommand: |
+          ./mvnw package -pl onlyoffice-monday-tenant -am -DskipTests && \
+          ./mvnw jib:dockerBuild -pl onlyoffice-monday-tenant -DskipTests -Djib.to.image=$IMAGE
+        dependencies:
+          paths:
+            - onlyoffice-monday-tenant/src
+            - onlyoffice-monday-tenant/pom.xml
+            - onlyoffice-monday-configuration/src
+            - onlyoffice-monday-configuration/pom.xml
+            - onlyoffice-monday-common/src
+            - onlyoffice-monday-common/pom.xml
+    - image: onlyoffice-monday-user
+      custom:
+        buildCommand: |
+          ./mvnw package -pl onlyoffice-monday-user -am -DskipTests && \
+          ./mvnw jib:dockerBuild -pl onlyoffice-monday-user -DskipTests -Djib.to.image=$IMAGE
+        dependencies:
+          paths:
+            - onlyoffice-monday-user/src
+            - onlyoffice-monday-user/pom.xml
+            - onlyoffice-monday-configuration/src
+            - onlyoffice-monday-configuration/pom.xml
+            - onlyoffice-monday-common/src
+            - onlyoffice-monday-common/pom.xml
 manifests:
   rawYaml:
     - k8s/ingress.yml
@@ -35,7 +58,6 @@ manifests:
     - k8s/rabbit-service.yml
     - k8s/redis-deployment.yml
     - k8s/redis-service.yml
-    - onlyoffice-monday-user/k8s/**.yml
-    - onlyoffice-monday-tenant/k8s/**.yml
-    - onlyoffice-monday-notification/k8s/**.yml
     - onlyoffice-monday-gateway/k8s/**.yml
+    - onlyoffice-monday-tenant/k8s/**.yml
+    - onlyoffice-monday-user/k8s/**.yml

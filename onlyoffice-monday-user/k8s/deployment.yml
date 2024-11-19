@@ -29,6 +29,11 @@ spec:
           ports:
             - containerPort: 8080
           env:
+            - name: SERVER_ORIGIN
+              valueFrom:
+                configMapKeyRef:
+                  name: onlyoffice
+                  key: server.origin
             - name: SPRING_PROFILES_ACTIVE
               value: kubernetes
             - name: SPRING_DATASOURCE_URL
