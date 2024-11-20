@@ -103,7 +103,7 @@
                         evt.preventDefault();
                         try {
                             if (this.url && this.url != this.lastUrl) {
-                                const timeout = setTimeout(() => this.setError(), 6500);
+                                const timeout = setTimeout(() => this.setError(), 12500);
                                 window.DocSpace.SDK.initSystem({
                                     src: this.url,
                                     frameId: 'ds-frame',
@@ -111,6 +111,7 @@
                                         onAppReady: async () => {
                                             try {
                                                 clearTimeout(timeout);
+                                                if (this.error) return;
                                                 this.lastUrl = this.url;
                                                 await this.processLogin(evt, this.url, this.email, this.password);
                                             } catch (error) {

@@ -63,6 +63,7 @@
                         events: {
                             onAppReady: async () => {
                                 clearTimeout(timeout);
+                                if (this.error) return;
                                 this.setDocSpaceReady();
                             }
                         }
