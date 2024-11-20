@@ -7,9 +7,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -35,9 +38,10 @@ public class MondayAuthenticationFilter extends OncePerRequestFilter {
       HttpServletRequest request, HttpServletResponse response, FilterChain chain)
       throws ServletException, IOException {
     var token = request.getParameter(SESSION_TOKEN_PARAM);
-    var tokenHeader = request.getHeader(HX_CURRENT_URL);
-    if (tokenHeader == null || tokenHeader.isBlank())
-      tokenHeader = request.getHeader(HttpHeaders.REFERER);
+    var tokenHeader =
+        getHeaderIgnoreCase(request, HX_CURRENT_URL)
+            .or(() -> getHeaderIgnoreCase(request, HttpHeaders.REFERER))
+            .orElse(Strings.EMPTY);
 
     if (token == null || token.isBlank()) {
       var params =
@@ -75,5 +79,12 @@ public class MondayAuthenticationFilter extends OncePerRequestFilter {
     return path.startsWith("/actuator")
         || path.contains("main.css")
         || path.contains("webSocket.js");
+  }
+
+  private Optional<String> getHeaderIgnoreCase(HttpServletRequest request, String headerName) {
+    return Collections.list(request.getHeaderNames()).stream()
+        .filter(name -> name.equalsIgnoreCase(headerName))
+        .findFirst()
+        .map(request::getHeader);
   }
 }
