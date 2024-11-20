@@ -5,44 +5,14 @@ metadata:
 build:
   artifacts:
     - image: onlyoffice-monday-gateway
-      custom:
-        buildCommand: |
-          ./mvnw package -pl onlyoffice-monday-gateway -am -DskipTests && \
-          ./mvnw jib:dockerBuild -pl onlyoffice-monday-gateway -DskipTests -Djib.to.image=$IMAGE
-        dependencies:
-          paths:
-            - onlyoffice-monday-gateway/src
-            - onlyoffice-monday-gateway/pom.xml
-            - onlyoffice-monday-configuration/src
-            - onlyoffice-monday-configuration/pom.xml
-            - onlyoffice-monday-common/src
-            - onlyoffice-monday-common/pom.xml
+      jib:
+        project: com.onlyoffice:onlyoffice-monday-gateway
     - image: onlyoffice-monday-tenant
-      custom:
-        buildCommand: |
-          ./mvnw package -pl onlyoffice-monday-tenant -am -DskipTests && \
-          ./mvnw jib:dockerBuild -pl onlyoffice-monday-tenant -DskipTests -Djib.to.image=$IMAGE
-        dependencies:
-          paths:
-            - onlyoffice-monday-tenant/src
-            - onlyoffice-monday-tenant/pom.xml
-            - onlyoffice-monday-configuration/src
-            - onlyoffice-monday-configuration/pom.xml
-            - onlyoffice-monday-common/src
-            - onlyoffice-monday-common/pom.xml
+      jib:
+        project: com.onlyoffice:onlyoffice-monday-tenant
     - image: onlyoffice-monday-user
-      custom:
-        buildCommand: |
-          ./mvnw package -pl onlyoffice-monday-user -am -DskipTests && \
-          ./mvnw jib:dockerBuild -pl onlyoffice-monday-user -DskipTests -Djib.to.image=$IMAGE
-        dependencies:
-          paths:
-            - onlyoffice-monday-user/src
-            - onlyoffice-monday-user/pom.xml
-            - onlyoffice-monday-configuration/src
-            - onlyoffice-monday-configuration/pom.xml
-            - onlyoffice-monday-common/src
-            - onlyoffice-monday-common/pom.xml
+      jib:
+        project: com.onlyoffice:onlyoffice-monday-user
 manifests:
   rawYaml:
     - k8s/ingress.yml
