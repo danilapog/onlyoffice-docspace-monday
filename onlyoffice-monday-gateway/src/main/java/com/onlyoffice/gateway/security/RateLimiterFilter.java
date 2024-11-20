@@ -1,5 +1,6 @@
 package com.onlyoffice.gateway.security;
 
+import com.onlyoffice.gateway.configuration.security.DistributedRateLimiterFactoryConfiguration;
 import io.github.bucket4j.BucketConfiguration;
 import io.github.bucket4j.redis.lettuce.cas.LettuceBasedProxyManager;
 import jakarta.servlet.FilterChain;
@@ -24,7 +25,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class RateLimiterFilter extends OncePerRequestFilter {
   private final String X_FORWARDED_FOR = "X-Forwarded-For";
 
-  private final Function<HttpMethod, Supplier<BucketConfiguration>> bucketFactory;
+  private final DistributedRateLimiterFactoryConfiguration bucketFactory;
   private final LettuceBasedProxyManager proxyManager;
 
   protected void doFilterInternal(
@@ -32,7 +33,8 @@ public class RateLimiterFilter extends OncePerRequestFilter {
       throws ServletException, IOException {
     try {
       var method = request.getMethod();
-      var bucketConfigurationFactory = bucketFactory.apply(HttpMethod.valueOf(method));
+      var bucketConfigurationFactory = bucketFactory.bucketConfigurationFactory()
+              .apply(HttpMethod.valueOf(method));
       var client = request.getHeader(X_FORWARDED_FOR);
       if (client == null || client.isBlank()) client = request.getRemoteAddr();
       var bucket =

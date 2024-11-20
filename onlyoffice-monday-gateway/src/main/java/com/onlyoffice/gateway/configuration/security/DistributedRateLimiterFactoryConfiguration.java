@@ -7,15 +7,16 @@ import io.github.bucket4j.distributed.ExpirationAfterWriteStrategy;
 import io.github.bucket4j.redis.lettuce.cas.LettuceBasedProxyManager;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.RedisURI;
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
-import java.util.function.Function;
-import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.http.HttpMethod;
+
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 @Configuration
 @RequiredArgsConstructor
@@ -46,7 +47,6 @@ public class DistributedRateLimiterFactoryConfiguration {
         .build();
   }
 
-  @Bean
   public Function<HttpMethod, Supplier<BucketConfiguration>> bucketConfigurationFactory() {
     var rateLimitProperties = configuration.getRateLimits();
     return (HttpMethod method) -> {
