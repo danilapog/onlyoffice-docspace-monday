@@ -6,6 +6,7 @@ import com.onlyoffice.common.user.transfer.response.DocSpaceUsers;
 import com.onlyoffice.common.user.transfer.response.UserCredentials;
 import com.onlyoffice.user.service.query.UserQueryService;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import jakarta.validation.constraints.Positive;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,8 +28,8 @@ public class UserQueryController {
   @RateLimiter(name = "getUser")
   @GetMapping("/{tenantId}/{mondayId}")
   public ResponseEntity<UserCredentials> findUser(
-      @PathVariable("tenantId") int tenantId,
-      @PathVariable("mondayId") int mondayId,
+      @PathVariable("tenantId") @Positive int tenantId,
+      @PathVariable("mondayId") @Positive int mondayId,
       @RequestHeader(value = "X-Timeout", defaultValue = "3500") int timeout) {
     return ResponseEntity.ok(
         queryService.findUser(
@@ -38,7 +39,7 @@ public class UserQueryController {
   @RateLimiter(name = "getUser")
   @GetMapping("/{tenantId}")
   public ResponseEntity<DocSpaceUsers> findDocSpaceUsers(
-      @PathVariable("tenantId") int tenantId,
+      @PathVariable("tenantId") @Positive int tenantId,
       @RequestParam("id") Set<Integer> ids,
       @RequestHeader(value = "X-Timeout", defaultValue = "3500") int timeout) {
     return ResponseEntity.ok(
