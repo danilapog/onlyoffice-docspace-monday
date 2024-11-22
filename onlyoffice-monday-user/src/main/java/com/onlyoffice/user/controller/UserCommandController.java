@@ -4,6 +4,7 @@ import com.onlyoffice.common.user.transfer.request.command.RegisterUser;
 import com.onlyoffice.common.user.transfer.response.UserCredentials;
 import com.onlyoffice.user.service.command.UserCommandService;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -28,7 +29,7 @@ public class UserCommandController {
 
   @PostMapping
   @RateLimiter(name = "registerUser")
-  public ResponseEntity<UserCredentials> registerUser(@RequestBody RegisterUser body) {
+  public ResponseEntity<UserCredentials> registerUser(@RequestBody @Valid RegisterUser body) {
     commandService.register(body);
     return ResponseEntity.status(HttpStatus.CREATED).build();
   }
