@@ -4,6 +4,7 @@ import com.onlyoffice.common.tenant.transfer.request.command.RegisterDocSpace;
 import com.onlyoffice.tenant.exception.TenantNotFoundException;
 import com.onlyoffice.tenant.persistence.entity.Docspace;
 import com.onlyoffice.tenant.persistence.repository.TenantRepository;
+import jakarta.validation.Valid;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,15 +12,17 @@ import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 @Slf4j
 @Service
+@Validated
 @RequiredArgsConstructor
 public class BasicDocSpaceCommandService implements DocSpaceCommandService {
   private final TenantRepository tenantRepository;
 
   @Transactional(isolation = Isolation.REPEATABLE_READ, rollbackFor = Exception.class)
-  public void register(RegisterDocSpace command) {
+  public void register(@Valid RegisterDocSpace command) {
     try {
       MDC.put("tenant_id", String.valueOf(command.getTenantId()));
       MDC.put("docspace_url", command.getUrl());
