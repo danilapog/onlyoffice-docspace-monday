@@ -1,7 +1,6 @@
 package com.onlyoffice.gateway.security;
 
 import com.onlyoffice.gateway.configuration.security.DistributedRateLimiterFactoryConfiguration;
-import io.github.bucket4j.BucketConfiguration;
 import io.github.bucket4j.redis.lettuce.cas.LettuceBasedProxyManager;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -9,8 +8,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.function.Function;
-import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
@@ -33,8 +30,8 @@ public class RateLimiterFilter extends OncePerRequestFilter {
       throws ServletException, IOException {
     try {
       var method = request.getMethod();
-      var bucketConfigurationFactory = bucketFactory.bucketConfigurationFactory()
-              .apply(HttpMethod.valueOf(method));
+      var bucketConfigurationFactory =
+          bucketFactory.bucketConfigurationFactory().apply(HttpMethod.valueOf(method));
       var client = request.getHeader(X_FORWARDED_FOR);
       if (client == null || client.isBlank()) client = request.getRemoteAddr();
       var bucket =
