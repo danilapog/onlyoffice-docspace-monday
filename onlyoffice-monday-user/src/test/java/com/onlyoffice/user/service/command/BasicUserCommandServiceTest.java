@@ -1,15 +1,18 @@
 package com.onlyoffice.user.service.command;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
+import com.onlyoffice.common.CommandMessage;
 import com.onlyoffice.common.user.transfer.request.command.RegisterUser;
+import com.onlyoffice.common.user.transfer.request.command.RemoveTenantUsers;
 import com.onlyoffice.user.persistence.entity.User;
 import com.onlyoffice.user.persistence.repository.UserRepository;
 import jakarta.validation.ConstraintViolationException;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -122,6 +125,28 @@ public class BasicUserCommandServiceTest {
               .email("notmail")
               .hash("mock")
               .build());
+    }
+  }
+
+  @Nested
+  class RemoveUserTests {
+    @Test
+    void shouldRemoveAllUsers() {
+      assertThatNoException()
+          .isThrownBy(
+              () ->
+                  service.removeAll(
+                      CommandMessage.<RemoveTenantUsers>builder()
+                          .payload(RemoveTenantUsers.builder().tenantId(1).build())
+                          .commandAt(Instant.now().toEpochMilli())
+                          .build()));
+    }
+
+    @Test
+    void shouldThrowRemoveAllUsersWhenInvalidCommand() {
+      assertThatThrownBy(
+              () -> service.removeAll(CommandMessage.<RemoveTenantUsers>builder().build()))
+          .isInstanceOf(ConstraintViolationException.class);
     }
   }
 }
