@@ -57,7 +57,7 @@ public class BasicUserCommandServiceTest {
   class RegisterUserTests {
     @ParameterizedTest
     @MethodSource("validRegisterUserCommandGenerator")
-    void shouldRegisterNewUserWhenUserDoesNotExist(RegisterUser command) {
+    void shouldRegisterNewUser_WhenUserDoesNotExist(RegisterUser command) {
       Mockito.when(userRepository.findById(Mockito.any())).thenReturn(Optional.empty());
 
       service.register(command);
@@ -75,7 +75,7 @@ public class BasicUserCommandServiceTest {
 
     @ParameterizedTest
     @MethodSource("invalidRegisterUserCommandGenerator")
-    void shouldFailRegistrationNewUserWhenUserInvalid(RegisterUser command) {
+    void shouldFailRegistrationNewUser_WhenUserInvalid(RegisterUser command) {
       Mockito.when(userRepository.findById(Mockito.any())).thenReturn(Optional.empty());
 
       assertThatThrownBy(() -> service.register(command))
@@ -143,7 +143,7 @@ public class BasicUserCommandServiceTest {
     }
 
     @Test
-    void shouldThrowRemoveAllUsersWhenInvalidCommand() {
+    void shouldThrowRemoveAllUsers_WhenInvalidCommand() {
       assertThatThrownBy(
               () -> service.removeAll(CommandMessage.<RemoveTenantUsers>builder().build()))
           .isInstanceOf(ConstraintViolationException.class);
