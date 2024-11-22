@@ -4,18 +4,21 @@ import com.onlyoffice.common.tenant.transfer.request.query.FindEntity;
 import com.onlyoffice.common.tenant.transfer.response.TenantCredentials;
 import com.onlyoffice.tenant.exception.TenantNotFoundException;
 import com.onlyoffice.tenant.persistence.repository.TenantRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 @Slf4j
 @Service
+@Validated
 @RequiredArgsConstructor
 public class BasicTenantQueryService implements TenantQueryService {
   private final TenantRepository tenantRepository;
 
-  public TenantCredentials find(FindEntity query) {
+  public TenantCredentials find(@Valid FindEntity query) {
     try {
       MDC.put("tenant_id", String.valueOf(query.getId()));
       log.info("Trying to find tenant credentials by tenant id");
