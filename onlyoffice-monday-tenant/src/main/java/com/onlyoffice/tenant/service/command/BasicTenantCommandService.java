@@ -13,15 +13,18 @@ import com.onlyoffice.tenant.persistence.entity.Outbox;
 import com.onlyoffice.tenant.persistence.entity.OutboxType;
 import com.onlyoffice.tenant.persistence.repository.OutboxRepository;
 import com.onlyoffice.tenant.persistence.repository.TenantRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 @Slf4j
 @Service
+@Validated
 @RequiredArgsConstructor
 public class BasicTenantCommandService implements TenantCommandService {
   private final ObjectMapper objectMapper;
@@ -29,7 +32,7 @@ public class BasicTenantCommandService implements TenantCommandService {
   private final TenantRepository tenantRepository;
 
   @Transactional(isolation = Isolation.READ_COMMITTED, rollbackFor = Exception.class)
-  public TenantCredentials register(RegisterTenant command) {
+  public TenantCredentials register(@Valid RegisterTenant command) {
     try {
       MDC.put("tenant_id", String.valueOf(command.getId()));
       MDC.put("monday_user_id", String.valueOf(command.getMondayUserId()));
