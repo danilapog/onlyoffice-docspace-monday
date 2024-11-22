@@ -6,21 +6,25 @@ import com.onlyoffice.common.user.transfer.request.command.RemoveTenantUsers;
 import com.onlyoffice.user.persistence.entity.User;
 import com.onlyoffice.user.persistence.entity.UserId;
 import com.onlyoffice.user.persistence.repository.UserRepository;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 @Slf4j
 @Service
+@Validated
 @RequiredArgsConstructor
 public class BasicUserCommandService implements UserCommandService {
   private final UserRepository userRepository;
 
   @Transactional(isolation = Isolation.REPEATABLE_READ, rollbackFor = Exception.class)
-  public void register(RegisterUser payload) {
+  public void register(@Valid @NotNull RegisterUser payload) {
     try {
       MDC.put("tenant_id", String.valueOf(payload.getTenantId()));
       MDC.put("monday_id", String.valueOf(payload.getMondayId()));
@@ -55,7 +59,7 @@ public class BasicUserCommandService implements UserCommandService {
   }
 
   @Transactional(isolation = Isolation.REPEATABLE_READ, rollbackFor = Exception.class)
-  public void register(CommandMessage<RegisterUser> command) {
+  public void register(@Valid @NotNull CommandMessage<RegisterUser> command) {
     try {
       var payload = command.getPayload();
       MDC.put("tenant_id", String.valueOf(payload.getTenantId()));
@@ -93,7 +97,7 @@ public class BasicUserCommandService implements UserCommandService {
   }
 
   @Transactional
-  public void removeAll(CommandMessage<RemoveTenantUsers> command) {
+  public void removeAll(@Valid @NotNull CommandMessage<RemoveTenantUsers> command) {
     try {
       var payload = command.getPayload();
       MDC.put("tenant_id", String.valueOf(payload.getTenantId()));
