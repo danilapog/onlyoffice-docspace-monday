@@ -10,6 +10,8 @@ import org.hibernate.validator.constraints.URL;
 @Getter
 @Setter
 @Builder
+@ToString
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 public class RegisterDocSpace {

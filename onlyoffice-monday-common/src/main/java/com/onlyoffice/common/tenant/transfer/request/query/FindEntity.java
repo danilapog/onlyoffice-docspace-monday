@@ -1,13 +1,13 @@
 package com.onlyoffice.common.tenant.transfer.request.query;
 
 import jakarta.validation.constraints.Positive;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @Builder
+@ToString
+@EqualsAndHashCode
 public class FindEntity {
   @Positive private int id;
 }

@@ -14,6 +14,7 @@ import lombok.*;
 @Setter
 @Builder
 @ToString
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)

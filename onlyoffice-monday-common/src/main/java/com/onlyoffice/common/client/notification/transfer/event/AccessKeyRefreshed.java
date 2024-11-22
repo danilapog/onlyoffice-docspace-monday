@@ -7,6 +7,8 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
+@ToString
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 public class AccessKeyRefreshed implements NotificationEvent {

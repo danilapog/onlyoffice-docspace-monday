@@ -5,6 +5,8 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
+@ToString
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 public class ErrorDetails {
