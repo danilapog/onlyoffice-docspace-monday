@@ -14,6 +14,8 @@ import com.onlyoffice.tenant.persistence.entity.OutboxType;
 import com.onlyoffice.tenant.persistence.repository.BoardRepository;
 import com.onlyoffice.tenant.persistence.repository.OutboxRepository;
 import com.onlyoffice.tenant.persistence.repository.TenantRepository;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,9 +23,11 @@ import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 @Slf4j
 @Service
+@Validated
 @RequiredArgsConstructor
 public class BasicBoardCommandService implements BoardCommandService {
   private final ObjectMapper mapper;
@@ -33,7 +37,7 @@ public class BasicBoardCommandService implements BoardCommandService {
   private final TenantRepository tenantRepository;
 
   @Transactional(isolation = Isolation.REPEATABLE_READ, rollbackFor = Exception.class)
-  public void register(RegisterRoom command, Set<String> docSpaceUsers) {
+  public void register(@Valid RegisterRoom command, @NotNull Set<String> docSpaceUsers) {
     try {
       MDC.put("tenant_id", String.valueOf(command.getTenantId()));
       MDC.put("board_id", String.valueOf(command.getBoardId()));
@@ -87,7 +91,7 @@ public class BasicBoardCommandService implements BoardCommandService {
   }
 
   @Transactional(isolation = Isolation.REPEATABLE_READ, rollbackFor = Exception.class)
-  public void remove(RemoveRoom command) {
+  public void remove(@Valid RemoveRoom command) {
     try {
       MDC.put("tenant_id", String.valueOf(command.getTenantId()));
       MDC.put("board_id", String.valueOf(command.getBoardId()));
