@@ -29,7 +29,7 @@ import org.springframework.validation.annotation.Validated;
 public class BasicUserQueryService implements UserQueryService {
   private final UserRepository userRepository;
 
-  public UserCredentials findUser(FindUser query) {
+  public UserCredentials findUser(@Valid FindUser query) {
     try {
       MDC.put("tenant_id", String.valueOf(query.getTenantId()));
       MDC.put("monday_id", String.valueOf(query.getMondayId()));
@@ -55,7 +55,7 @@ public class BasicUserQueryService implements UserQueryService {
     }
   }
 
-  public UserCredentials findUser(FindUser query, int timeout) {
+  public UserCredentials findUser(@Valid FindUser query, @Positive int timeout) {
     var leastTimeout = Math.min(timeout, 3500);
     try {
       MDC.put("tenant_id", String.valueOf(query.getTenantId()));
@@ -96,7 +96,7 @@ public class BasicUserQueryService implements UserQueryService {
     }
   }
 
-  public DocSpaceUsers findDocSpaceUsers(FindDocSpaceUsers query) {
+  public DocSpaceUsers findDocSpaceUsers(@Valid FindDocSpaceUsers query) {
     try {
       MDC.put("tenant_id", String.valueOf(query.getTenantId()));
       log.info("Trying to find DocSpace users by tenant_id");
