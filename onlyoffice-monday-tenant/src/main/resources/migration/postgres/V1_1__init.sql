@@ -36,8 +36,8 @@ CREATE TABLE tenants.monday_tenants (
 	PRIMARY KEY (id)
 );
 
-CREATE INDEX monday_tenant_docspace_idx on tenants.monday_tenant_docspace (url, tenant_id);
+CREATE INDEX monday_tenant_docspace_idx ON tenants.monday_tenant_docspace USING BTREE(url, tenant_id);
 ALTER TABLE IF EXISTS tenants.monday_tenant_docspace ADD CONSTRAINT UK_tenant_id UNIQUE (tenant_id);
-CREATE INDEX monday_tenant_boards_idx on tenants.monday_tenant_registered_boards (room_id, tenant_id);
+CREATE INDEX monday_tenant_boards_idx ON tenants.monday_tenant_registered_boards USING BTREE(room_id, tenant_id);
 ALTER TABLE IF EXISTS tenants.monday_tenant_docspace ADD CONSTRAINT FK_docspace_monday_tenant FOREIGN KEY (tenant_id) REFERENCES tenants.monday_tenants;
 ALTER TABLE IF EXISTS tenants.monday_tenant_registered_boards ADD CONSTRAINT FK_board_monday_tenant FOREIGN KEY (tenant_id) REFERENCES tenants.monday_tenants;
