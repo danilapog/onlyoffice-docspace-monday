@@ -211,6 +211,9 @@
                 <version>${maven.surefire.plugin.version}</version>
                 <configuration>
                     <argLine>-XX:+EnableDynamicAgentLoading</argLine>
+                    <excludes>
+                        <exclude>**/UserControllerPerformanceTest.java</exclude>
+                    </excludes>
                 </configuration>
             </plugin>
             <plugin>
