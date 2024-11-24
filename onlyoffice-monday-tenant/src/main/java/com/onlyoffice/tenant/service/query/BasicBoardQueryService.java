@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -18,6 +19,7 @@ import org.springframework.validation.annotation.Validated;
 public class BasicBoardQueryService implements BoardQueryService {
   private final BoardRepository boardRepository;
 
+  @Cacheable(value = "boards", key = "#query.id")
   public BoardInformation find(@Valid FindEntity query) {
     try {
       MDC.put("board_id", String.valueOf(query.getId()));

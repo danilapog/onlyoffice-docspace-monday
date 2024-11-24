@@ -16,6 +16,8 @@ build:
 manifests:
   rawYaml:
     - k8s/ingress.yml
+    - k8s/hazelcast-role.yml
+    - k8s/hazelcast-rolebinding.yml
     - k8s/onlyoffice-configmap.yml
     - k8s/onlyoffice-role.yml
     - k8s/onlyoffice-secret.yml

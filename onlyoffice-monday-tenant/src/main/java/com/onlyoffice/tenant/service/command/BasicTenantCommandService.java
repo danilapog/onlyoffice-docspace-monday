@@ -17,6 +17,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +32,7 @@ public class BasicTenantCommandService implements TenantCommandService {
   private final OutboxRepository outboxRepository;
   private final TenantRepository tenantRepository;
 
+  @CacheEvict(value = "tenants", key = "#command.id")
   @Transactional(isolation = Isolation.READ_COMMITTED, rollbackFor = Exception.class)
   public TenantCredentials register(@Valid RegisterTenant command) {
     try {

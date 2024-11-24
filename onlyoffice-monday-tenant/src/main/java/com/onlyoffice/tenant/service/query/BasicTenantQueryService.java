@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -18,6 +19,7 @@ import org.springframework.validation.annotation.Validated;
 public class BasicTenantQueryService implements TenantQueryService {
   private final TenantRepository tenantRepository;
 
+  @Cacheable(value = "tenants", key = "#query.id")
   public TenantCredentials find(@Valid FindEntity query) {
     try {
       MDC.put("tenant_id", String.valueOf(query.getId()));

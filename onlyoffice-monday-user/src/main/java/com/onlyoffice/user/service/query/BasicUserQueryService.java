@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -29,6 +30,7 @@ import org.springframework.validation.annotation.Validated;
 public class BasicUserQueryService implements UserQueryService {
   private final UserRepository userRepository;
 
+  @Cacheable(value = "users", key = "#query.tenantId+#query.mondayId", unless = "#result == null")
   public UserCredentials findUser(@Valid FindUser query) {
     try {
       MDC.put("tenant_id", String.valueOf(query.getTenantId()));
@@ -55,6 +57,7 @@ public class BasicUserQueryService implements UserQueryService {
     }
   }
 
+  @Cacheable(value = "users", key = "#query.tenantId+#query.mondayId", unless = "#result == null")
   public UserCredentials findUser(@Valid FindUser query, @Positive int timeout) {
     var leastTimeout = Math.min(timeout, 3500);
     try {

@@ -9,6 +9,7 @@ import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,7 @@ import org.springframework.validation.annotation.Validated;
 public class BasicDocSpaceCommandService implements DocSpaceCommandService {
   private final TenantRepository tenantRepository;
 
+  @CacheEvict(value = "tenants", key = "#command.tenantId")
   @Transactional(isolation = Isolation.REPEATABLE_READ, rollbackFor = Exception.class)
   public void register(@Valid RegisterDocSpace command) {
     try {

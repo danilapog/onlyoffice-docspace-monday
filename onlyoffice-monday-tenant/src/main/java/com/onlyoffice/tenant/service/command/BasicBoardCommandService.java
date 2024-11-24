@@ -20,6 +20,7 @@ import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +37,7 @@ public class BasicBoardCommandService implements BoardCommandService {
   private final BoardRepository boardRepository;
   private final TenantRepository tenantRepository;
 
+  @CacheEvict(value = "boards", key = "#command.boardId")
   @Transactional(isolation = Isolation.REPEATABLE_READ, rollbackFor = Exception.class)
   public void register(@Valid RegisterRoom command, @NotNull Set<String> docSpaceUsers) {
     try {
@@ -90,6 +92,7 @@ public class BasicBoardCommandService implements BoardCommandService {
     }
   }
 
+  @CacheEvict(value = "boards", key = "#command.boardId")
   @Transactional(isolation = Isolation.REPEATABLE_READ, rollbackFor = Exception.class)
   public void remove(@Valid RemoveRoom command) {
     try {

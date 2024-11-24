@@ -11,6 +11,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,7 @@ import org.springframework.validation.annotation.Validated;
 public class BasicUserCommandService implements UserCommandService {
   private final UserRepository userRepository;
 
+  @CacheEvict(value = "users", key = "#payload.tenantId+#payload.mondayId")
   @Transactional(isolation = Isolation.REPEATABLE_READ, rollbackFor = Exception.class)
   public void register(@Valid @NotNull RegisterUser payload) {
     try {
@@ -58,6 +60,7 @@ public class BasicUserCommandService implements UserCommandService {
     }
   }
 
+  @CacheEvict(value = "users", key = "#payload.tenantId+#payload.mondayId")
   @Transactional(isolation = Isolation.REPEATABLE_READ, rollbackFor = Exception.class)
   public void register(@Valid @NotNull CommandMessage<RegisterUser> command) {
     try {
@@ -97,6 +100,7 @@ public class BasicUserCommandService implements UserCommandService {
   }
 
   @Transactional
+  @CacheEvict(value = "users")
   public void removeAll(@Valid @NotNull CommandMessage<RemoveTenantUsers> command) {
     try {
       var payload = command.getPayload();
