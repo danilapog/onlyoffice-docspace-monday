@@ -37,7 +37,7 @@ spec:
                   key: server.origin
             - name: SPRING_PROFILES_ACTIVE
               value: "kubernetes"
-            - name: HZ_NETWORK_JOIN_MULTICAST_ENABLED
+            - name: HZ_NETWORK_JOIN_TCPIP_ENABLED
               value: "false"
             - name: HZ_NETWORK_JOIN_KUBERNETES_ENABLED
               value: "true"
