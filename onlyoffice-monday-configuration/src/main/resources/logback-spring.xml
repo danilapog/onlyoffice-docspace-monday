@@ -1,5 +1,5 @@
 <configuration>
-    <springProfile name="default">
+    <springProfile name="default,d,dev,develop,development">
         <include resource="org/springframework/boot/logging/logback/base.xml"/>
     </springProfile>
     <springProfile name="kubernetes,performance">
