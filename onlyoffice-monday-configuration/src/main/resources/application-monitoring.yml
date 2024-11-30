@@ -7,6 +7,9 @@ management:
     enabled: ${MANAGEMENT_TRACING_ENABLED:false}
     sampling:
       probability: ${MANAGEMENT_TRACING_SAMPLING_PROBABILITY:0.5}
+  metrics:
+    tags:
+      application: ${spring.application.name}
   endpoint:
     health:
       readiness-state:
