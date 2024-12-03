@@ -13,7 +13,7 @@ spring:
         enabled: false
     feign:
       client:
-        onlyoffice-user-name: ONLYOFFICE-USER
+        onlyoffice-user-name: ${SPRING_CLOUD_FEIGN_ONLYOFFICE_USER_NAME:ONLYOFFICE-USER}
     openfeign:
       circuitbreaker:
         enabled: true

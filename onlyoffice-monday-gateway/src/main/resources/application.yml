@@ -29,8 +29,8 @@ spring:
         enabled: false
     feign:
       client:
-        onlyoffice-user-name: ONLYOFFICE-USER
-        onlyoffice-tenant-name: ONLYOFFICE-TENANT
+        onlyoffice-user-name: ${SPRING_CLOUD_FEIGN_ONLYOFFICE_USER_NAME:ONLYOFFICE-USER}
+        onlyoffice-tenant-name: ${SPRING_CLOUD_FEIGN_ONLYOFFICE_TENANT_NAME:ONLYOFFICE-TENANT}
     openfeign:
       circuitbreaker:
         enabled: true
