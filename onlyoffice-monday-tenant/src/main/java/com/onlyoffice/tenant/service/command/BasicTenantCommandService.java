@@ -6,7 +6,6 @@ import com.onlyoffice.common.CommandMessage;
 import com.onlyoffice.common.tenant.transfer.request.command.RegisterTenant;
 import com.onlyoffice.common.tenant.transfer.response.TenantCredentials;
 import com.onlyoffice.common.user.transfer.request.command.RegisterUser;
-import com.onlyoffice.common.user.transfer.request.command.RemoveTenantUsers;
 import com.onlyoffice.tenant.exception.OutboxSerializationException;
 import com.onlyoffice.tenant.persistence.entity.Docspace;
 import com.onlyoffice.tenant.persistence.entity.Outbox;
@@ -73,16 +72,6 @@ public class BasicTenantCommandService implements TenantCommandService {
                                   .email(command.getAdminLogin())
                                   .hash(command.getAdminHash())
                                   .build())
-                          .build()))
-              .build());
-      outboxRepository.save(
-          Outbox.builder()
-              .type(OutboxType.REMOVE_TENANT_USERS)
-              .payload(
-                  objectMapper.writeValueAsString(
-                      CommandMessage.<RemoveTenantUsers>builder()
-                          .commandAt(now)
-                          .payload(RemoveTenantUsers.builder().tenantId(command.getId()).build())
                           .build()))
               .build());
 

@@ -1,6 +1,7 @@
 package com.onlyoffice.tenant.service.command;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -60,11 +61,9 @@ public class BasicTenantCommandServiceTest {
                           && tenant.getDocspace().getUrl().equals(command.getUrl())
                           && tenant.getDocspace().getAdminLogin().equals(command.getAdminLogin())
                           && tenant.getDocspace().getAdminHash().equals(command.getAdminHash())));
-      verify(outboxRepository, times(2)).save(any(Outbox.class));
+      verify(outboxRepository, times(1)).save(any(Outbox.class));
       verify(outboxRepository)
           .save(argThat(outbox -> outbox.getType() == OutboxType.CREATE_USER_ON_INITIALIZATION));
-      verify(outboxRepository)
-          .save(argThat(outbox -> outbox.getType() == OutboxType.REMOVE_TENANT_USERS));
       assertThat(credentials).isNotNull();
       assertThat(credentials.getId()).isEqualTo(command.getId());
     }

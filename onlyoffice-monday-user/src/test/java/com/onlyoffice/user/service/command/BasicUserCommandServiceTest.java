@@ -29,11 +29,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {BasicUserCommandServiceTest.TestConfig.class})
 public class BasicUserCommandServiceTest {
+  @MockBean private PlatformTransactionManager platformTransactionManager;
   @MockBean private UserRepository userRepository;
   @MockBean private CacheManager cacheManager;
   @Autowired private UserCommandService service;

@@ -45,16 +45,4 @@ public class User {
   private Long updatedAt;
 
   @Version private long version;
-
-  @PrePersist
-  protected void prePersist() {
-    var now = System.currentTimeMillis();
-    createdAt = now;
-    updatedAt = now;
-  }
-
-  @PreUpdate
-  protected void preUpdate() {
-    updatedAt = System.currentTimeMillis();
-  }
 }
