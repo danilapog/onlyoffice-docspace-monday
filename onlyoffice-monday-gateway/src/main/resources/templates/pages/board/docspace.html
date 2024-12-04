@@ -35,7 +35,7 @@
                     if (this.initialized) return;
 
                     const monday = mondaySdk();
-                    const { boardId, theme } = (await monday.get("context")).data;
+                    const { boardId, theme, user } = (await monday.get("context")).data;
 
                     window.DocSpace.SDK.initSystem({
                         src: this.url,
@@ -62,10 +62,24 @@
                                         mode: this.accessKey ? "other" : "manager",
                                         events: {
                                             onAppReady: () => { this.appReady = true; },
+                                            onNotFound: async () => {
+                                                if (user.isAdmin) {
+                                                    const { data } = await monday.execute("confirm", {
+                                                        message: this.unlinkMessageText,
+                                                        excludeCancelButton: false
+                                                    });
+
+                                                    if (data.confirm)
+                                                        htmx.ajax('DELETE', `/api/1.0/rooms/${boardId}`, {
+                                                            target: 'body',
+                                                            swap: 'none',
+                                                        });
+                                                }
+                                            },
                                             onContentReady: async () => {
                                                 this.contentReady = true;
                                                 const staleRoom = this.contentReady && !this.appReady;
-                                                if (staleRoom) {
+                                                if (staleRoom && user.isAdmin) {
                                                     const { data } = await monday.execute("confirm", {
                                                        message: this.unlinkMessageText,
                                                        excludeCancelButton: false
