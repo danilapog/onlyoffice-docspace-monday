@@ -19,7 +19,7 @@
     >
         <div x-show="admin">
             <x-text-field
-                    id="docspace_url"
+                    id="docspace_admin_url"
                     name="url"
                     th:label="${page?.data?.settingsForm?.fields?.docSpaceLabel} ?: 'DocSpace Server Address'"
                     x-model="url"
@@ -31,7 +31,7 @@
         </div>
         <div x-show="!admin" class="hidden">
             <x-text-field
-                    id="docspace_url"
+                    id="docspace_user_url"
                     name="url"
                     th:label="${page?.data?.settingsForm?.fields?.docSpaceLabel} ?: 'DocSpace Server Address'"
                     x-model="url"

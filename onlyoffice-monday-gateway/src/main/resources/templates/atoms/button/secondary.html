@@ -1,6 +1,5 @@
 <template x-component="secondary-button">
     <button x-data="{
-                id: '',
                 type: $el.parentNode?.getAttribute('type') || 'button',
                 text: $el.parentNode?.getAttribute('text') || $el.parentNode?.getAttribute('data-text') || 'Button',
                 classes: $el.parentNode?.getAttribute('classes') || '',
@@ -10,7 +9,6 @@
                     }
                 }
             }"
-            :id="id"
             :type="type"
             x-text="text"
             :disabled="disabled"
