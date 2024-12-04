@@ -53,17 +53,11 @@
                     this.confirmation = !this.confirmation;
                 },
                 init() {
-                    const timeout = setTimeout(async () => {
-                        this.setError();
-                    }, 6500);
-
                     const docSpace = window.DocSpace.SDK.initSystem({
                         src: this.url,
                         frameId: 'ds-frame',
                         events: {
                             onAppReady: async () => {
-                                clearTimeout(timeout);
-                                if (this.error) return;
                                 this.setDocSpaceReady();
                             }
                         }
