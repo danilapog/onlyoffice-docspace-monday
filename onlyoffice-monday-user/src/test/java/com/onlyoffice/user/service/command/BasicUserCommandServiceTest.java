@@ -24,6 +24,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
@@ -34,6 +35,7 @@ import org.springframework.validation.beanvalidation.MethodValidationPostProcess
 @ContextConfiguration(classes = {BasicUserCommandServiceTest.TestConfig.class})
 public class BasicUserCommandServiceTest {
   @MockBean private UserRepository userRepository;
+  @MockBean private CacheManager cacheManager;
   @Autowired private UserCommandService service;
 
   @TestConfiguration
