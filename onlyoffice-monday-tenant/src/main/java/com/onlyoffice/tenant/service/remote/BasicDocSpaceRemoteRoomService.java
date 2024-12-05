@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
+import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
@@ -37,6 +38,7 @@ public class BasicDocSpaceRemoteRoomService implements DocSpaceRemoteRoomService
   private final PlatformTransactionManager transactionManager;
   private final TenantRepository tenantRepository;
   private final BoardRepository boardRepository;
+  private final CacheManager cacheManager;
 
   private final DocSpaceClient client;
 
@@ -44,11 +46,13 @@ public class BasicDocSpaceRemoteRoomService implements DocSpaceRemoteRoomService
       EncryptionService encryptionService,
       TenantRepository tenantRepository,
       BoardRepository boardRepository,
-      PlatformTransactionManager transactionManager) {
+      PlatformTransactionManager transactionManager,
+      CacheManager cacheManager) {
     this.encryptionService = encryptionService;
     this.tenantRepository = tenantRepository;
     this.boardRepository = boardRepository;
     this.transactionManager = transactionManager;
+    this.cacheManager = cacheManager;
     this.client =
         Feign.builder()
             .encoder(new JacksonEncoder())
@@ -59,6 +63,8 @@ public class BasicDocSpaceRemoteRoomService implements DocSpaceRemoteRoomService
   public AccessKeyRefreshed refreshAccessKey(CommandMessage<RefreshAccessKey> command) {
     try {
       var payload = command.getPayload();
+      var boardsCache = cacheManager.getCache("boards");
+      if (boardsCache != null) boardsCache.evict(payload.getBoardId());
 
       MDC.put("board_id", String.valueOf(payload.getBoardId()));
       log.info("Refreshing access key for current board");

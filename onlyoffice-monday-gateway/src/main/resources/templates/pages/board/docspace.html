@@ -60,6 +60,7 @@
                                         theme: theme && theme === 'light' ? "Base" : "Dark",
                                         id: this.roomId,
                                         mode: this.accessKey ? "other" : "manager",
+                                        requestToken: this.accessKey,
                                         events: {
                                             onAppReady: () => { this.appReady = true; },
                                             onNotFound: async () => {
@@ -94,7 +95,7 @@
                                             },
                                         },
                                         ...(this.accessKey
-                                            ? { rootPath: `/rooms/share?key=${this.accessKey}&folder=${this.roomId}&searchArea=3&page=1&sortby=DateAndTime&sortorder=descending` }
+                                            ? { rootPath: `/rooms/share` }
                                             : {})
                                     });
                                 } catch (error) {
