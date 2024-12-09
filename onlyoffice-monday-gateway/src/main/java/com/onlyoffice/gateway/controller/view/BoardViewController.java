@@ -19,6 +19,7 @@ import io.micrometer.context.ContextSnapshotFactory;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import lombok.RequiredArgsConstructor;
@@ -93,6 +94,8 @@ public class BoardViewController implements InitializingBean, DisposableBean {
 
       counter.increment();
       return renderDocSpaceBoardView(tenantCredentials, userCredentials, boardInformation, partial);
+    } catch (CompletionException e) {
+      return handleServerError(user, partial);
     } catch (RuntimeException e) {
       log.error("Could not render board page", e);
       return handleTenantNotFound(user, partial);
@@ -133,6 +136,14 @@ public class BoardViewController implements InitializingBean, DisposableBean {
             messageService.getMessage("pages.errors.configuration.subtext"),
             TemplateLocation.NOT_CONFIGURED_ERROR.getPath(),
             partial);
+  }
+
+  private ModelAndView handleServerError(MondayAuthenticationPrincipal user, boolean partial) {
+    return renderSimpleErrorView(
+        messageService.getMessage("pages.errors.server.header"),
+        messageService.getMessage("pages.errors.server.subtext"),
+        TemplateLocation.SERVER_ERROR.getPath(),
+        partial);
   }
 
   private ModelAndView renderCreateRoomView(

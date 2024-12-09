@@ -23,7 +23,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class AesEncryptionService implements EncryptionService {
-  @Value("${spring.security.oauth2.client.registration.monday.clientSecret}")
+  @Value("${spring.security.oauth2.client.registration.monday.encryptionSecret}")
   private String secret;
 
   private static final String ALGORITHM = "AES/GCM/NoPadding";
