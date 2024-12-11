@@ -19,6 +19,7 @@ import feign.Target;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 import java.net.URI;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -78,7 +79,7 @@ public class BasicDocSpaceRemoteRoomService implements DocSpaceRemoteRoomService
                           String.format("Could not find board with id %d", payload.getBoardId())));
       var docspace = board.getTenant().getDocspace();
       var url = URI.create(docspace.getUrl());
-      var accessKey =
+      var accessKeyResult =
           CompletableFuture.supplyAsync(
                   () ->
                       client.generateToken(
@@ -89,14 +90,23 @@ public class BasicDocSpaceRemoteRoomService implements DocSpaceRemoteRoomService
                               .build()))
               .thenApply(
                   token ->
-                      client
-                          .generateSharedKey(url, board.getRoomId(), token.getResponse().getToken())
-                          .getResponse()
-                          .getFirst()
-                          .getSharedTo()
-                          .getRequestToken())
+                      Optional.ofNullable(
+                          client
+                              .generateSharedKey(
+                                  url, board.getRoomId(), token.getResponse().getToken())
+                              .getResponse()))
+              .exceptionally((ex) -> Optional.empty())
               .get(5, TimeUnit.SECONDS);
 
+      var accessKey =
+          accessKeyResult
+              .orElseThrow(
+                  () ->
+                      new OperationExecutionException(
+                          "Could not get an accessKey response from DocSpace"))
+              .getFirst()
+              .getSharedTo()
+              .getRequestToken();
       var template = new TransactionTemplate(transactionManager);
       template.setIsolationLevel(TransactionDefinition.ISOLATION_REPEATABLE_READ);
       template.setTimeout(2);
@@ -110,7 +120,7 @@ public class BasicDocSpaceRemoteRoomService implements DocSpaceRemoteRoomService
           .boardId(payload.getBoardId())
           .build();
     } catch (Exception e) {
-      log.error("Could not refresh access key", e);
+      log.warn("Could not refresh access key", e);
       throw new OperationExecutionException(e);
     } finally {
       MDC.clear();
@@ -162,7 +172,7 @@ public class BasicDocSpaceRemoteRoomService implements DocSpaceRemoteRoomService
                           .build()))
           .get(5, TimeUnit.SECONDS);
     } catch (Exception e) {
-      log.error("Could not invite users to DocSpace", e);
+      log.warn("Could not invite users to DocSpace", e);
       throw new OperationExecutionException(e);
     } finally {
       MDC.clear();
