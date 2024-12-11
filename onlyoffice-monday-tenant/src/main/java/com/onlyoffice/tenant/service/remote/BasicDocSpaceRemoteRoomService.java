@@ -95,11 +95,11 @@ public class BasicDocSpaceRemoteRoomService implements DocSpaceRemoteRoomService
                           .getFirst()
                           .getSharedTo()
                           .getRequestToken())
-              .get(2, TimeUnit.SECONDS);
+              .get(5, TimeUnit.SECONDS);
 
       var template = new TransactionTemplate(transactionManager);
       template.setIsolationLevel(TransactionDefinition.ISOLATION_REPEATABLE_READ);
-      template.setTimeout(1);
+      template.setTimeout(2);
       template.execute(
           status -> {
             boardRepository.getReferenceById(payload.getBoardId()).setAccessKey(accessKey);
@@ -160,7 +160,7 @@ public class BasicDocSpaceRemoteRoomService implements DocSpaceRemoteRoomService
                                   .collect(Collectors.toSet()))
                           .notify(true)
                           .build()))
-          .get(3, TimeUnit.SECONDS);
+          .get(5, TimeUnit.SECONDS);
     } catch (Exception e) {
       log.error("Could not invite users to DocSpace", e);
       throw new OperationExecutionException(e);

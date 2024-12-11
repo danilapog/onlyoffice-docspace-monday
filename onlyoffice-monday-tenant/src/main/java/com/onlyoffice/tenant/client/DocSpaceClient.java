@@ -35,7 +35,7 @@ public interface DocSpaceClient {
       name = "docSpaceClientCircuitBreaker",
       fallbackMethod = "generateSharedKeyFallback")
   GenericResponse<List<RoomLink>> generateSharedKey(
-      URI baseUri, @Param("roomId") int roomId, @Param("token") String token);
+      URI baseUri, @Param("roomId") long roomId, @Param("token") String token);
 
   @RequestLine("PUT /api/2.0/files/rooms/{roomId}/share")
   @Headers({"Authorization: {token}", "Content-Type: application/json"})
@@ -45,7 +45,7 @@ public interface DocSpaceClient {
       fallbackMethod = "changeRoomAccessFallback")
   GenericResponse<MembersAccess> changeRoomAccess(
       URI baseUri,
-      @Param("roomId") int roomId,
+      @Param("roomId") long roomId,
       @Param("token") String token,
       ChangeRoomAccess command);
 
@@ -55,12 +55,12 @@ public interface DocSpaceClient {
   }
 
   default GenericResponse<List<RoomLink>> generateSharedKeyFallback(
-      URI baseUri, int roomId, String token, Exception ex) {
+      URI baseUri, long roomId, String token, Exception ex) {
     throw new DocSpaceServiceException("Could not generate shared key for room " + roomId, ex);
   }
 
   default GenericResponse<MembersAccess> changeRoomAccessFallback(
-      URI baseUri, int roomId, String token, ChangeRoomAccess command, Exception ex) {
+      URI baseUri, long roomId, String token, ChangeRoomAccess command, Exception ex) {
     throw new DocSpaceServiceException("Could not change room access for room " + roomId, ex);
   }
 }

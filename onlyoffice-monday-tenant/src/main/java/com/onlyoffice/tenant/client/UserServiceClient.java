@@ -21,7 +21,7 @@ public interface UserServiceClient {
   @Retry(name = "userServiceRetry")
   @CircuitBreaker(name = "userServiceCircuitBreaker", fallbackMethod = "findDocSpaceUsersFallback")
   ResponseEntity<DocSpaceUsers> findDocSpaceUsers(
-      @PathVariable int tenantId, @RequestParam("id") Set<String> ids);
+      @PathVariable long tenantId, @RequestParam("id") Set<String> ids);
 
   @GetMapping("/users/{tenantId}")
   @Retry(name = "userServiceRetry")
@@ -29,17 +29,17 @@ public interface UserServiceClient {
       name = "userServiceCircuitBreaker",
       fallbackMethod = "findDocSpaceUsersWithTimeoutFallback")
   ResponseEntity<DocSpaceUsers> findDocSpaceUsers(
-      @PathVariable int tenantId,
+      @PathVariable long tenantId,
       @RequestParam("id") Set<String> ids,
       @RequestHeader("X-Timeout") int timeout);
 
   default ResponseEntity<DocSpaceUsers> findDocSpaceUsersFallback(
-      int tenantId, Set<String> ids, Exception ex) {
+      long tenantId, Set<String> ids, Exception ex) {
     throw new UserServiceException("Could not find DocSpace users", ex);
   }
 
   default ResponseEntity<DocSpaceUsers> findDocSpaceUsersWithTimeoutFallback(
-      int tenantId, Set<String> ids, int timeout, Exception ex) {
+      long tenantId, Set<String> ids, int timeout, Exception ex) {
     throw new UserServiceException("Could not find DocSpace users with timeout", ex);
   }
 }

@@ -1,8 +1,8 @@
 CREATE SCHEMA IF NOT EXISTS users;
 
 CREATE TABLE users.monday_tenant_users (
-	monday_id INTEGER NOT NULL,
-	tenant_id INTEGER NOT NULL,
+	monday_id BIGINT NOT NULL,
+	tenant_id BIGINT NOT NULL,
 	docspace_id VARCHAR(255) NOT NULL,
 	email VARCHAR(255) NOT NULL,
 	hash VARCHAR(255) NOT NULL,

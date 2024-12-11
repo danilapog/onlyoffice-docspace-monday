@@ -19,11 +19,11 @@ public class Board {
   // Monday board id
   @Id
   @Column(nullable = false, updatable = false)
-  private int id;
+  private long id;
 
   // DocSpace generated id
   @Column(name = "room_id", nullable = false)
-  private int roomId;
+  private long roomId;
 
   @ManyToOne
   @JoinColumn(name = "tenant_id", nullable = false, updatable = false)

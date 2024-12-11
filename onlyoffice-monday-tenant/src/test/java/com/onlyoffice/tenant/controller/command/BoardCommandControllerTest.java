@@ -47,16 +47,16 @@ public class BoardCommandControllerTest {
   void shouldRegisterRoom_WhenValidRequest_ThenReturnCreatedStatus() throws Exception {
     var command =
         RegisterRoom.builder()
-            .tenantId(1)
-            .boardId(2)
-            .roomId(3)
+            .tenantId(1L)
+            .boardId(2L)
+            .roomId(3L)
             .mondayUsers(Set.of("4", "5"))
             .build();
 
     var usersResponse =
         ResponseEntity.ok(DocSpaceUsers.builder().ids(Set.of("user1", "user2")).build());
 
-    Mockito.when(userService.findDocSpaceUsers(Mockito.eq(1), Mockito.eq(Set.of("4", "5"))))
+    Mockito.when(userService.findDocSpaceUsers(Mockito.eq(1L), Mockito.eq(Set.of("4", "5"))))
         .thenReturn(usersResponse);
 
     var response =
@@ -67,7 +67,7 @@ public class BoardCommandControllerTest {
             .andReturn()
             .getResponse();
 
-    Mockito.verify(userService).findDocSpaceUsers(Mockito.eq(1), Mockito.eq(Set.of("4", "5")));
+    Mockito.verify(userService).findDocSpaceUsers(Mockito.eq(1L), Mockito.eq(Set.of("4", "5")));
     Mockito.verify(commandService)
         .register(
             Mockito.argThat(
@@ -82,7 +82,8 @@ public class BoardCommandControllerTest {
 
   @Test
   void shouldNotRegisterRoom_WhenInvalidRequest_ThenReturnBadRequest() throws Exception {
-    var command = RegisterRoom.builder().boardId(2).roomId(3).mondayUsers(Set.of("4", "5")).build();
+    var command =
+        RegisterRoom.builder().boardId(2L).roomId(3L).mondayUsers(Set.of("4", "5")).build();
 
     var response =
         mvc.perform(
@@ -99,7 +100,7 @@ public class BoardCommandControllerTest {
 
   @Test
   void shouldDeleteRoom_WhenValidRequest_ThenReturnOkStatus() throws Exception {
-    var command = RemoveRoom.builder().tenantId(1).boardId(2).build();
+    var command = RemoveRoom.builder().tenantId(1L).boardId(2L).build();
 
     var response =
         mvc.perform(
@@ -121,7 +122,7 @@ public class BoardCommandControllerTest {
 
   @Test
   void shouldNotDeleteRoom_WhenInvalidRequest_ThenReturnBadRequest() throws Exception {
-    var command = RemoveRoom.builder().boardId(2).build();
+    var command = RemoveRoom.builder().boardId(2L).build();
 
     var response =
         mvc.perform(

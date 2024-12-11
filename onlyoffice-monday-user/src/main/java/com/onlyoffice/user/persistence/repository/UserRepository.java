@@ -11,5 +11,5 @@ public interface UserRepository extends JpaRepository<User, UserId>, TimeoutUser
   @Modifying
   @Query("DELETE FROM User u WHERE u.tenantId = :tenantId AND u.updatedAt <= :timestamp")
   void deleteAllByTenantIdAndUpdatedAtLessThanEqual(
-      @Param("tenantId") int tenantId, @Param("timestamp") long timestamp);
+      @Param("tenantId") long tenantId, @Param("timestamp") long timestamp);
 }

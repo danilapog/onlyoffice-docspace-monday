@@ -69,7 +69,7 @@ public class RoomController {
   @DeleteMapping("/{boardId}")
   @Secured("ROLE_ADMIN")
   public ResponseEntity<?> unlinkRoom(
-      @AuthenticationPrincipal MondayAuthenticationPrincipal user, @PathVariable int boardId) {
+      @AuthenticationPrincipal MondayAuthenticationPrincipal user, @PathVariable long boardId) {
     try {
       var response =
           tenantService.removeRoom(

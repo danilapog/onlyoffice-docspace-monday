@@ -19,7 +19,7 @@ public class DocSpaceBoardModel {
   @Builder
   public static class DocSpaceBoardManagerModel {
     @Builder.Default private String accessKey = "";
-    @Builder.Default private int roomId = -1;
+    @Builder.Default private long roomId = -1;
 
     @Builder.Default
     private String notificationText = "Public room is now available for this board";

@@ -28,8 +28,8 @@ public class UserQueryController {
   @RateLimiter(name = "getUser")
   @GetMapping("/{tenantId}/{mondayId}")
   public ResponseEntity<UserCredentials> findUser(
-      @PathVariable("tenantId") @Positive int tenantId,
-      @PathVariable("mondayId") @Positive int mondayId,
+      @PathVariable("tenantId") @Positive long tenantId,
+      @PathVariable("mondayId") @Positive long mondayId,
       @RequestHeader(value = "X-Timeout", defaultValue = "3500") int timeout) {
     return ResponseEntity.ok(
         queryService.findUser(
@@ -39,8 +39,8 @@ public class UserQueryController {
   @RateLimiter(name = "getUser")
   @GetMapping("/{tenantId}")
   public ResponseEntity<DocSpaceUsers> findDocSpaceUsers(
-      @PathVariable("tenantId") @Positive int tenantId,
-      @RequestParam("id") Set<Integer> ids,
+      @PathVariable("tenantId") @Positive long tenantId,
+      @RequestParam("id") Set<Long> ids,
       @RequestHeader(value = "X-Timeout", defaultValue = "3500") int timeout) {
     return ResponseEntity.ok(
         queryService.findDocSpaceUsers(

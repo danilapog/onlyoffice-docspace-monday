@@ -13,6 +13,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FindDocSpaceUsers {
-  @Positive private int tenantId;
-  @NotNull private Set<Integer> mondayIds;
+  @Positive private long tenantId;
+  @NotNull private Set<Long> mondayIds;
 }

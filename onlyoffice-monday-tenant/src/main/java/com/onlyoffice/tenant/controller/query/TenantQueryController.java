@@ -29,7 +29,7 @@ public class TenantQueryController {
   @GetMapping("/{tenantId}")
   @RateLimiter(name = "findTenant")
   @JsonView(View.GetTenantView.class)
-  public ResponseEntity<TenantCredentials> findTenant(@PathVariable @Positive int tenantId) {
+  public ResponseEntity<TenantCredentials> findTenant(@PathVariable @Positive long tenantId) {
     return ResponseEntity.ok(queryService.find(FindEntity.builder().id(tenantId).build()));
   }
 }

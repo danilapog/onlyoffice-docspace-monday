@@ -11,6 +11,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FindUser {
-  @Positive private int tenantId;
-  @Positive private int mondayId;
+  @Positive private long tenantId;
+  @Positive private long mondayId;
 }

@@ -18,28 +18,29 @@ public interface UserServiceClient {
   @GetMapping("/users/{tenantId}/{mondayId}")
   @Retry(name = "userServiceQueryRetry")
   @CircuitBreaker(name = "userServiceCircuitBreaker", fallbackMethod = "findUserFallback")
-  ResponseEntity<UserCredentials> findUser(@PathVariable int tenantId, @PathVariable int mondayId);
+  ResponseEntity<UserCredentials> findUser(
+      @PathVariable long tenantId, @PathVariable long mondayId);
 
   @GetMapping("/users/{tenantId}/{mondayId}")
   @Retry(name = "userServiceQueryRetry")
   @CircuitBreaker(name = "userServiceCircuitBreaker", fallbackMethod = "findUserFallback")
   ResponseEntity<UserCredentials> findUser(
-      @PathVariable int tenantId,
-      @PathVariable int mondayId,
+      @PathVariable long tenantId,
+      @PathVariable long mondayId,
       @RequestHeader(value = "X-Timeout", defaultValue = "3500") int timeout);
 
   @GetMapping("/users/{tenantId}")
   @Retry(name = "userServiceQueryRetry")
   @CircuitBreaker(name = "userServiceCircuitBreaker", fallbackMethod = "findDocSpaceUsersFallback")
   ResponseEntity<DocSpaceUsers> findDocSpaceUsers(
-      @PathVariable("tenantId") int tenantId, @RequestParam("id") Set<Integer> ids);
+      @PathVariable("tenantId") long tenantId, @RequestParam("id") Set<Long> ids);
 
   @GetMapping("/users/{tenantId}")
   @Retry(name = "userServiceQueryRetry")
   @CircuitBreaker(name = "userServiceCircuitBreaker", fallbackMethod = "findDocSpaceUsersFallback")
   ResponseEntity<DocSpaceUsers> findDocSpaceUsers(
-      @PathVariable("tenantId") int tenantId,
-      @RequestParam("id") Set<Integer> ids,
+      @PathVariable("tenantId") long tenantId,
+      @RequestParam("id") Set<Long> ids,
       @RequestHeader(value = "X-Timeout", defaultValue = "3500") int timeout);
 
   @PostMapping("/users")
@@ -48,22 +49,22 @@ public interface UserServiceClient {
   ResponseEntity<?> registerUser(@RequestBody RegisterUser command);
 
   default ResponseEntity<UserCredentials> findUserFallback(
-      int tenantId, int mondayId, Exception ex) {
+      long tenantId, long mondayId, Exception ex) {
     return ResponseEntity.badRequest().build();
   }
 
   default ResponseEntity<UserCredentials> findUserFallback(
-      int tenantId, int mondayId, int timeout, Exception ex) {
+      long tenantId, long mondayId, int timeout, Exception ex) {
     return ResponseEntity.badRequest().build();
   }
 
   default ResponseEntity<DocSpaceUsers> findDocSpaceUsersFallback(
-      int tenantId, Set<Integer> ids, Exception ex) {
+      long tenantId, Set<Long> ids, Exception ex) {
     return ResponseEntity.badRequest().build();
   }
 
   default ResponseEntity<DocSpaceUsers> findDocSpaceUsersFallback(
-      int tenantId, Set<Integer> ids, int timeout) {
+      long tenantId, Set<Long> ids, int timeout) {
     return ResponseEntity.badRequest().build();
   }
 

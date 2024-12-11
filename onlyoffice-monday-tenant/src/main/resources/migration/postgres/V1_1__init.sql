@@ -4,7 +4,7 @@ CREATE TABLE tenants.monday_outbox (
 	id VARCHAR(255) NOT NULL,
 	payload JSONB,
 	type VARCHAR(255) CHECK (type IN ('REFRESH','INVITE','CREATE_USER_ON_INITIALIZATION','REMOVE_TENANT_USERS')),
-	created_at bigint NOT NULL,
+	created_at BIGINT NOT NULL,
 	PRIMARY KEY (id)
 );
 
@@ -13,24 +13,24 @@ CREATE TABLE tenants.monday_tenant_docspace (
 	hash VARCHAR(255) NOT NULL,
 	email VARCHAR(255) NOT NULL,
 	url VARCHAR(255) NOT NULL,
-	tenant_id INTEGER,
+	tenant_id BIGINT,
 	created_at BIGINT NOT NULL,
 	updated_at BIGINT,
 	PRIMARY KEY (id)
 );
 
 CREATE TABLE tenants.monday_tenant_registered_boards (
-	id INTEGER NOT NULL,
+	id BIGINT NOT NULL,
 	access_key VARCHAR(255),
-	room_id INTEGER NOT NULL,
-	tenant_id INTEGER NOT NULL,
+	room_id BIGINT NOT NULL,
+	tenant_id BIGINT NOT NULL,
 	created_at BIGINT NOT NULL,
 	updated_at BIGINT,
 	PRIMARY KEY (id)
 );
 
 CREATE TABLE tenants.monday_tenants (
-	id INTEGER NOT NULL,
+	id BIGINT NOT NULL,
 	created_at BIGINT NOT NULL,
 	updated_at BIGINT,
 	PRIMARY KEY (id)

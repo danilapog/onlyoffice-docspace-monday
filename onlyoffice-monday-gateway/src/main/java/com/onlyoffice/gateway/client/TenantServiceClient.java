@@ -25,12 +25,12 @@ public interface TenantServiceClient {
   @GetMapping("/tenants/{tenantId}")
   @Retry(name = "tenantServiceQueryRetry")
   @CircuitBreaker(name = "tenantServiceCircuitBreaker", fallbackMethod = "findTenantFallback")
-  ResponseEntity<TenantCredentials> findTenant(@PathVariable int tenantId);
+  ResponseEntity<TenantCredentials> findTenant(@PathVariable long tenantId);
 
   @GetMapping("/tenants/boards/{boardId}")
   @Retry(name = "tenantServiceQueryRetry")
   @CircuitBreaker(name = "tenantServiceCircuitBreaker", fallbackMethod = "findBoardFallback")
-  ResponseEntity<BoardInformation> findBoard(@PathVariable int boardId);
+  ResponseEntity<BoardInformation> findBoard(@PathVariable long boardId);
 
   @PostMapping("/tenants/boards/room")
   @Retry(name = "tenantServiceCommandRetry")
@@ -52,11 +52,11 @@ public interface TenantServiceClient {
     return ResponseEntity.badRequest().build();
   }
 
-  default ResponseEntity<TenantCredentials> findTenantFallback(int tenantId, Exception ex) {
+  default ResponseEntity<TenantCredentials> findTenantFallback(long tenantId, Exception ex) {
     return ResponseEntity.badRequest().build();
   }
 
-  default ResponseEntity<BoardInformation> findBoardFallback(int boardId, Exception ex) {
+  default ResponseEntity<BoardInformation> findBoardFallback(long boardId, Exception ex) {
     return ResponseEntity.badRequest().build();
   }
 

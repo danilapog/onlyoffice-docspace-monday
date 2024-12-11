@@ -10,5 +10,5 @@ import lombok.*;
 @AllArgsConstructor
 public class SessionToken {
   @JsonProperty("account_id")
-  private int accountId;
+  private long accountId;
 }

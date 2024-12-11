@@ -18,8 +18,8 @@ import org.hibernate.validator.constraints.URL;
 @AllArgsConstructor
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class RegisterTenant {
-  @Positive private int id;
-  private int mondayUserId;
+  @Positive private long id;
+  private long mondayUserId;
 
   @NotNull @NotBlank @URL private String url;
 

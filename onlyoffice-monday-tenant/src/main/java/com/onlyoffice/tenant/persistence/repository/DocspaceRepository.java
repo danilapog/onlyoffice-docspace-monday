@@ -5,5 +5,5 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface DocspaceRepository extends JpaRepository<Docspace, String> {
-  Optional<Docspace> findByTenantId(int tenantId);
+  Optional<Docspace> findByTenantId(long tenantId);
 }

@@ -17,7 +17,7 @@ import org.hibernate.validator.constraints.URL;
 public class RegisterDocSpace {
   @Positive
   @JsonProperty("id")
-  private int tenantId;
+  private long tenantId;
 
   @NotNull @NotBlank @URL private String url;
 

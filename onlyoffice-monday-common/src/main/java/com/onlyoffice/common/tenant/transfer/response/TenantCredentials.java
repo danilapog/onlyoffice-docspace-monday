@@ -14,7 +14,7 @@ import lombok.*;
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class TenantCredentials {
   @JsonView(View.RegisterTenantView.class)
-  private int id;
+  private long id;
 
   @JsonProperty("docspace_url")
   @JsonView(View.GetTenantView.class)

@@ -62,7 +62,7 @@ public class BoardViewController implements InitializingBean, DisposableBean {
 
   @GetMapping
   public ModelAndView renderBoard(
-      @RequestParam("boardId") int boardId,
+      @RequestParam("boardId") long boardId,
       @AuthenticationPrincipal MondayAuthenticationPrincipal user) {
     return getBoardView(boardId, user, false);
   }
@@ -70,13 +70,13 @@ public class BoardViewController implements InitializingBean, DisposableBean {
   @GetMapping("/refresh")
   @ResponseBody
   public ModelAndView refreshBoard(
-      @RequestParam("boardId") int boardId,
+      @RequestParam("boardId") long boardId,
       @AuthenticationPrincipal MondayAuthenticationPrincipal user) {
     return getBoardView(boardId, user, true);
   }
 
   private ModelAndView getBoardView(
-      int boardId, MondayAuthenticationPrincipal user, boolean partial) {
+      long boardId, MondayAuthenticationPrincipal user, boolean partial) {
     try {
       var userCredentials = getUserCredentials(user);
       var tenantCredentials = getTenantCredentials(user);
@@ -122,7 +122,7 @@ public class BoardViewController implements InitializingBean, DisposableBean {
         .getBody();
   }
 
-  private BoardInformation getBoardInformation(int boardId) {
+  private BoardInformation getBoardInformation(long boardId) {
     return CompletableFuture.supplyAsync(() -> tenantService.findBoard(boardId), executor)
         .join()
         .getBody();

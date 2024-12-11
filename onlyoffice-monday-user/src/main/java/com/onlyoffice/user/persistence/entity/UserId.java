@@ -10,6 +10,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserId implements Serializable {
-  private int mondayId;
-  private int tenantId;
+  private long mondayId;
+  private long tenantId;
 }

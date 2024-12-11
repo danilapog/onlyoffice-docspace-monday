@@ -13,7 +13,7 @@ import lombok.*;
 @AllArgsConstructor
 public class TenantChanged implements NotificationEvent {
   @JsonProperty("tenant_id")
-  private int tenantId;
+  private long tenantId;
 
   @JsonGetter("type")
   public String type() {

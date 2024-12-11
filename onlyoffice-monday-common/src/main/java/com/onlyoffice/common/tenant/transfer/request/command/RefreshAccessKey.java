@@ -14,5 +14,5 @@ import lombok.*;
 @AllArgsConstructor
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class RefreshAccessKey {
-  @Positive private int boardId;
+  @Positive private long boardId;
 }

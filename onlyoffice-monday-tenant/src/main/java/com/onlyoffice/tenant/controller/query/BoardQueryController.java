@@ -26,7 +26,7 @@ public class BoardQueryController {
 
   @GetMapping("/{boardId}")
   @RateLimiter(name = "findBoard")
-  public ResponseEntity<BoardInformation> findBoard(@PathVariable @Positive int boardId) {
+  public ResponseEntity<BoardInformation> findBoard(@PathVariable @Positive long boardId) {
     return ResponseEntity.ok(queryService.find(FindEntity.builder().id(boardId).build()));
   }
 }

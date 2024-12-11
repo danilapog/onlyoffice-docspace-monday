@@ -13,10 +13,10 @@ import lombok.*;
 @AllArgsConstructor
 public class AccessKeyRefreshed implements NotificationEvent {
   @JsonProperty("board_id")
-  private int boardId;
+  private long boardId;
 
   @JsonProperty("tenant_id")
-  private int tenantId;
+  private long tenantId;
 
   @JsonGetter("type")
   public String type() {

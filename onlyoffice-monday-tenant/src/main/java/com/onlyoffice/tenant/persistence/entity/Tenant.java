@@ -19,7 +19,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 public class Tenant {
   @Id
   @Column(name = "id", nullable = false)
-  private int id;
+  private long id;
 
   @OneToOne(
       mappedBy = "tenant",

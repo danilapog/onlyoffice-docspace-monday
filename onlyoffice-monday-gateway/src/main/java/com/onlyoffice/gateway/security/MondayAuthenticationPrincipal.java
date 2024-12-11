@@ -8,8 +8,8 @@ import lombok.Getter;
 @Builder
 @JsonDeserialize(using = MondayAuthenticationPrincipalDeserializer.class)
 public class MondayAuthenticationPrincipal {
-  private int userId;
-  private int accountId;
+  private long userId;
+  private long accountId;
   private String slug;
   private boolean isAdmin;
   private boolean isViewOnly;

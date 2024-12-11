@@ -23,11 +23,11 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 public class User {
   @Id
   @Column(name = "monday_id", nullable = false, updatable = false)
-  private int mondayId;
+  private long mondayId;
 
   @Id
   @Column(name = "tenant_id", nullable = false, updatable = false)
-  private int tenantId;
+  private long tenantId;
 
   @Column(name = "docspace_id", nullable = false)
   private String docSpaceId;

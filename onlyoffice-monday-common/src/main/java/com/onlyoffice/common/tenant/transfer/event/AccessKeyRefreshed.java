@@ -10,6 +10,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AccessKeyRefreshed {
-  private int boardId;
-  private int tenantId;
+  private long boardId;
+  private long tenantId;
 }

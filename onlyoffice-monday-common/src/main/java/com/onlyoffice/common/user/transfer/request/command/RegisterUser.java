@@ -19,8 +19,8 @@ import lombok.*;
 @AllArgsConstructor
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class RegisterUser implements Serializable {
-  @Positive private int mondayId;
-  @Positive private int tenantId;
+  @Positive private long mondayId;
+  @Positive private long tenantId;
 
   @NotNull
   @NotBlank

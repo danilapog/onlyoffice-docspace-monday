@@ -9,5 +9,5 @@ import lombok.*;
 @ToString
 @EqualsAndHashCode
 public class FindEntity {
-  @Positive private int id;
+  @Positive private long id;
 }

@@ -14,6 +14,6 @@ import lombok.*;
 @AllArgsConstructor
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class RemoveRoom {
-  @Positive private int tenantId;
-  @Positive private int boardId;
+  @Positive private long tenantId;
+  @Positive private long boardId;
 }

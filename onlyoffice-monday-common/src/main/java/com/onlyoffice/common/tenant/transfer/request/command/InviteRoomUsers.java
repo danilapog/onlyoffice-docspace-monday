@@ -17,8 +17,8 @@ import lombok.*;
 @AllArgsConstructor
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class InviteRoomUsers {
-  @Positive private int tenantId;
-  @Positive private int roomId;
+  @Positive private long tenantId;
+  @Positive private long roomId;
 
   @NotNull
   @JsonProperty("users")

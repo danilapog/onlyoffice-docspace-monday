@@ -11,7 +11,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateRoomCommand {
-  private int boardId;
-  @Positive private int roomId;
+  private long boardId;
+  @Positive private long roomId;
   @NotNull private Set<String> users;
 }

@@ -12,8 +12,8 @@ public class MondayAuthenticationPrincipalDeserializer
       JsonParser parser, DeserializationContext deserializationContext) throws IOException {
     JsonNode node = parser.getCodec().readTree(parser);
     return MondayAuthenticationPrincipal.builder()
-        .userId(node.get("user_id").asInt())
-        .accountId(node.get("account_id").asInt())
+        .userId(node.get("user_id").asLong())
+        .accountId(node.get("account_id").asLong())
         .slug(node.get("slug").asText())
         .isAdmin(node.get("is_admin").asBoolean())
         .isViewOnly(node.get("is_view_only").asBoolean())

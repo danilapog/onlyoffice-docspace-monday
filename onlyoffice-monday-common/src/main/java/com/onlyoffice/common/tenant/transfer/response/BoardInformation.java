@@ -11,8 +11,8 @@ import lombok.*;
 @AllArgsConstructor
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class BoardInformation {
-  private int id;
-  private int roomId;
-  private int tenantId;
+  private long id;
+  private long roomId;
+  private long tenantId;
   private String accessKey;
 }
