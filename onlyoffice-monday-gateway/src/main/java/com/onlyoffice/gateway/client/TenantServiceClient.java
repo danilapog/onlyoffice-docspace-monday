@@ -1,9 +1,6 @@
 package com.onlyoffice.gateway.client;
 
-import com.onlyoffice.common.tenant.transfer.request.command.RegisterDocSpace;
-import com.onlyoffice.common.tenant.transfer.request.command.RegisterRoom;
-import com.onlyoffice.common.tenant.transfer.request.command.RegisterTenant;
-import com.onlyoffice.common.tenant.transfer.request.command.RemoveRoom;
+import com.onlyoffice.common.tenant.transfer.request.command.*;
 import com.onlyoffice.common.tenant.transfer.response.BoardInformation;
 import com.onlyoffice.common.tenant.transfer.response.TenantCredentials;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
@@ -42,6 +39,11 @@ public interface TenantServiceClient {
   @CircuitBreaker(name = "tenantServiceCircuitBreaker", fallbackMethod = "removeRoomFallback")
   ResponseEntity<?> removeRoom(@RequestBody RemoveRoom command);
 
+  @DeleteMapping("/tenants")
+  @Retry(name = "tenantServiceCommandRetry")
+  @CircuitBreaker(name = "tenantServiceCircuitBreaker", fallbackMethod = "removeTenantFallback")
+  ResponseEntity<?> removeTenant(@RequestBody RemoveTenant command);
+
   @PostMapping("/tenants/docspace")
   @Retry(name = "tenantServiceCommandRetry")
   @CircuitBreaker(name = "tenantServiceCircuitBreaker", fallbackMethod = "updateDocSpaceFallback")
@@ -65,6 +67,10 @@ public interface TenantServiceClient {
   }
 
   default ResponseEntity<?> removeRoomFallback(RemoveRoom command, Exception ex) {
+    return ResponseEntity.badRequest().build();
+  }
+
+  default ResponseEntity<?> removeTenantFallback(RemoveTenant command, Exception ex) {
     return ResponseEntity.badRequest().build();
   }
 

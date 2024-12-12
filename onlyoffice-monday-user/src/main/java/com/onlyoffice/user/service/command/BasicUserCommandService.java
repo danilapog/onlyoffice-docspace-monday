@@ -131,18 +131,33 @@ public class BasicUserCommandService implements UserCommandService {
     }
   }
 
-  @Transactional
+  @Retryable(
+      retryFor = {Exception.class},
+      maxAttempts = 7,
+      backoff = @Backoff(delay = 2000, multiplier = 1.5))
   public void removeAll(@Valid @NotNull CommandMessage<RemoveTenantUsers> command) {
     try {
       var payload = command.getPayload();
-      var cache = cacheManager.getCache("users");
       MDC.put("tenant_id", String.valueOf(payload.getTenantId()));
       log.info("Removing all tenant users");
 
+      var cache = cacheManager.getCache("users");
       if (cache != null) cache.clear();
 
-      userRepository.deleteAllByTenantIdAndUpdatedAtLessThanEqual(
-          payload.getTenantId(), command.getCommandAt());
+      var template = new TransactionTemplate(platformTransactionManager);
+      template.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+      template.setTimeout(2);
+      template.execute(
+          status -> {
+            try {
+              userRepository.deleteAllByTenantIdAndUpdatedAtLessThanEqual(
+                  payload.getTenantId(), command.getCommandAt());
+              return true;
+            } catch (Exception e) {
+              status.setRollbackOnly();
+              throw e;
+            }
+          });
     } finally {
       MDC.clear();
     }

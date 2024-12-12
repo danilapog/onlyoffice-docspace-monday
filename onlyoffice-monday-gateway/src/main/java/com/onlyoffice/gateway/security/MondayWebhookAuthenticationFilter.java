@@ -6,11 +6,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.net.URI;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.http.HttpHeaders;
@@ -21,38 +19,25 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.springframework.web.util.UriComponentsBuilder;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
-public class MondayAuthenticationFilter extends OncePerRequestFilter {
-  private static final String SESSION_TOKEN_PARAM = "sessionToken";
-  private static final String HX_CURRENT_URL = "HX-Current-URL";
+public class MondayWebhookAuthenticationFilter extends OncePerRequestFilter {
   private final ObjectMapper mapper = new ObjectMapper();
-
   private final JwtDecoder decoder;
   private final AuthenticationManager authenticationManager;
+
+  public MondayWebhookAuthenticationFilter(
+      JwtDecoder decoder, AuthenticationManager authenticationManager) {
+    this.decoder = decoder;
+    this.authenticationManager = authenticationManager;
+  }
 
   protected void doFilterInternal(
       HttpServletRequest request, HttpServletResponse response, FilterChain chain)
       throws ServletException, IOException {
-    var token = request.getParameter(SESSION_TOKEN_PARAM);
-    var tokenHeader =
-        getHeaderIgnoreCase(request, HX_CURRENT_URL)
-            .or(() -> getHeaderIgnoreCase(request, HttpHeaders.REFERER))
-            .orElse(Strings.EMPTY);
-
-    if (token == null || token.isBlank()) {
-      var params =
-          UriComponentsBuilder.fromUri(URI.create(tokenHeader))
-              .build()
-              .getQueryParams()
-              .get("sessionToken");
-      if (params != null && !params.isEmpty()) token = params.getFirst();
-    }
-
-    if (token == null || token.isBlank()) {
+    var token = getHeaderIgnoreCase(request, HttpHeaders.AUTHORIZATION).orElse(Strings.EMPTY);
+    if (token.isBlank()) {
       response.setStatus(HttpStatus.UNAUTHORIZED.value());
       return;
     }
@@ -76,10 +61,7 @@ public class MondayAuthenticationFilter extends OncePerRequestFilter {
 
   protected boolean shouldNotFilter(HttpServletRequest request) {
     var path = request.getRequestURI();
-    return path.startsWith("/actuator")
-        || path.startsWith("/api/1.0/webhook")
-        || path.contains("main.css")
-        || path.contains("webSocket.js");
+    return !path.startsWith("/api/1.0/webhook");
   }
 
   private Optional<String> getHeaderIgnoreCase(HttpServletRequest request, String headerName) {

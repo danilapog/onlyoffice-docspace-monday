@@ -1,6 +1,7 @@
 package com.onlyoffice.gateway.configuration.security;
 
 import com.onlyoffice.gateway.security.MondayAuthenticationFilter;
+import com.onlyoffice.gateway.security.MondayWebhookAuthenticationFilter;
 import com.onlyoffice.gateway.security.RateLimiterFilter;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ public class SecurityFilterChainConfiguration {
 
   private final RateLimiterFilter rateLimiterFilter;
   private final MondayAuthenticationFilter mondayAuthenticationFilter;
+  private final MondayWebhookAuthenticationFilter mondayWebhookAuthenticationFilter;
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -39,6 +41,8 @@ public class SecurityFilterChainConfiguration {
                     .authenticated())
         .addFilterBefore(rateLimiterFilter, UsernamePasswordAuthenticationFilter.class)
         .addFilterAt(mondayAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+        .addFilterAfter(
+            mondayWebhookAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
         .csrf(
             AbstractHttpConfigurer
                 ::disable) // No need to use it here, since we rely on Monday's sessionToken

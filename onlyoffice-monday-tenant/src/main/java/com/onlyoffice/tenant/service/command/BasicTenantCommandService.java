@@ -4,8 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onlyoffice.common.CommandMessage;
 import com.onlyoffice.common.tenant.transfer.request.command.RegisterTenant;
+import com.onlyoffice.common.tenant.transfer.request.command.RemoveTenant;
 import com.onlyoffice.common.tenant.transfer.response.TenantCredentials;
 import com.onlyoffice.common.user.transfer.request.command.RegisterUser;
+import com.onlyoffice.common.user.transfer.request.command.RemoveTenantUsers;
 import com.onlyoffice.tenant.exception.OutboxSerializationException;
 import com.onlyoffice.tenant.persistence.entity.Docspace;
 import com.onlyoffice.tenant.persistence.entity.Outbox;
@@ -79,6 +81,36 @@ public class BasicTenantCommandService implements TenantCommandService {
     } catch (JsonProcessingException e) {
       log.error("Could not perform json serialization", e);
       throw new OutboxSerializationException(e);
+    } finally {
+      MDC.clear();
+    }
+  }
+
+  @CacheEvict(value = "tenants", key = "#command.id")
+  @Transactional(timeout = 2, rollbackFor = Exception.class)
+  public boolean remove(RemoveTenant command) {
+    var tenant = tenantRepository.getReferenceById(command.getTenantId());
+    try {
+      MDC.put("tenant_id", String.valueOf(command.getTenantId()));
+      tenantRepository.delete(tenant);
+      outboxRepository.save(
+          Outbox.builder()
+              .type(OutboxType.REMOVE_TENANT_USERS)
+              .payload(
+                  objectMapper.writeValueAsString(
+                      CommandMessage.<RemoveTenantUsers>builder()
+                          .commandAt(System.currentTimeMillis())
+                          .payload(
+                              RemoveTenantUsers.builder().tenantId(command.getTenantId()).build())
+                          .build()))
+              .build());
+      return true;
+    } catch (JsonProcessingException e) {
+      log.warn("Could not perform json serialization", e);
+      return false;
+    } catch (Exception e) {
+      log.error("Could not remove current tenant", e);
+      return false;
     } finally {
       MDC.clear();
     }
