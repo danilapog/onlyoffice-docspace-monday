@@ -66,14 +66,15 @@
                                 };
 
                                 try {
+                                    const mondayTag = "Monday integration";
+                                    const composeTag = String(`Monday Board - ${context.data.boardId}`);
                                     const results = await withTimeout(Promise.allSettled([
-                                        docSpace.createTag("Monday"),
-                                        docSpace.createTag(`Monday-${context.data.boardId}`),
+                                        docSpace.createTag(mondayTag),
+                                        docSpace.createTag(composeTag),
                                         docSpace.createRoom(board.name, 6),
                                     ]), 10000);
 
                                     const roomResult = results[2];
-                                    const composeTag = String(`Monday-${context.data.boardId}`);
                                     if (!roomResult?.value?.id) {
                                         if (roomResult?.value?.status == 402) {
                                             this.enable();
@@ -95,7 +96,7 @@
                                         return;
                                     }
 
-                                    const link = await docSpace.addTagsToRoom(roomResult.value.id, ["Monday", composeTag]);
+                                    const link = await docSpace.addTagsToRoom(roomResult.value.id, [mondayTag, composeTag]);
                                     if (!link?.id)
                                         throw new Error("Could not create a new room");
 
