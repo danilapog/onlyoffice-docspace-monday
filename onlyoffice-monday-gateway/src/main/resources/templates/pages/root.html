@@ -24,6 +24,7 @@
                 persistedEmail: '[[${page?.data?.login?.email}]]',
                 persistedHash: '[[${page?.data?.login?.hash}]]',
                 loginError: '[[${page?.data?.login?.error}]]',
+                cspError: '[[${page?.data?.login?.cspError}]]',
                 fetchTranslated: async () => {
                     const monday = mondaySdk();
                     const { appFeature, boardId, user } = (await monday.get("context")).data;
@@ -44,6 +45,7 @@
                             window.DocSpace.SDK.initSystem({
                                 src: this.persistedUrl,
                                 frameId: 'root-ds',
+                                checkCSP: true,
                                 events: {
                                     onAppReady: async () => {
                                         try {
@@ -60,6 +62,15 @@
                                         }
                                     },
                                     onAppError: (error) => {
+                                        if (/\(CSP\)/.test(error)) {
+                                            mondaySdk().execute("notice", {
+                                                message: this.cspError,
+                                                type: "error",
+                                                timeout: 10000,
+                                            });
+                                            this.rootReady = true;
+                                            return;
+                                        }
                                         mondaySdk().execute("notice", {
                                             message: this.loginError,
                                             type: "error",

@@ -13,6 +13,7 @@
                 roomsQuotaError: '[[${page?.data?.roomsQuotaError}]]',
                 timeoutError: '[[${page?.data?.timeoutError}]]',
                 operationError: '[[${page?.data?.operationError}]]',
+                cspError: '[[${page?.data?.login?.cspError}]]',
                 loading: false,
                 disabled: false,
                 onAppReadyProcessed: false,
@@ -126,6 +127,25 @@
                                 } finally {
                                     await DocSpace.SDK.frames['ds-frame'].destroyFrame();
                                 }
+                            },
+                            onAppError: (error) => {
+                                if (/\(CSP\)/.test(error)) {
+                                    mondaySdk().execute("notice", {
+                                        message: this.cspError,
+                                        type: "error",
+                                        timeout: 10000,
+                                    });
+                                    this.enable();
+                                    this.onAppReadyProcessed = false;
+                                    return;
+                                }
+                                mondaySdk().execute("notice", {
+                                        message: this.operationError,
+                                        type: "error",
+                                        timeout: 10000,
+                                });
+                                this.enable();
+                                this.onAppReadyProcessed = false;
                             },
                         }
                     });

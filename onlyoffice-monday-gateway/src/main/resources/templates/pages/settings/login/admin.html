@@ -32,10 +32,15 @@
                 password: "",
                 loginError: "[[${page?.data?.login?.error}]]",
                 loginSuccess: "[[${page?.data?.login?.success}]]",
+                cspError: "[[${page?.data?.login?.cspError}]]",
                 setError() {
                     this.error = true;
                     this.loading = false;
                     this.disabled = false;
+                },
+                setCspError() {
+                    this.loading = false;
+                    this.disabled = true;
                 },
                 setSuccess() {
                     this.error = false;
@@ -56,10 +61,22 @@
                     const docSpace = window.DocSpace.SDK.initSystem({
                         src: this.url,
                         frameId: 'ds-frame',
+                        checkCSP: true,
                         events: {
                             onAppReady: async () => {
                                 this.setDocSpaceReady();
-                            }
+                            },
+                            onAppError: (error) => {
+                                if (/\(CSP\)/.test(error)) {
+                                    this.setCspError();
+                                    mondaySdk().execute("notice", {
+                                        message: this.cspError,
+                                        type: "error",
+                                        timeout: 10000,
+                                    });
+                                    return;
+                                }
+                            },
                         }
                     });
 

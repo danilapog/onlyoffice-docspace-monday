@@ -37,6 +37,10 @@
                     this.disabled = true;
                     this.loading = true;
                 },
+                resetLoading() {
+                    this.loading = false;
+                    this.disabled = false;
+                },
                 socketHandler: async (evt) => {
                     try {
                         const monday = mondaySdk();
@@ -108,6 +112,7 @@
                                 window.DocSpace.SDK.initSystem({
                                     src: this.url,
                                     frameId: 'ds-frame',
+                                    checkCSP: true,
                                     events: {
                                         onAppReady: async () => {
                                             try {
@@ -119,7 +124,18 @@
                                                 this.setError();
                                             }
                                         },
-                                        onAppError: (error) => this.setError(),
+                                        onAppError: async (error) => {
+                                            if (/\(CSP\)/.test(error)) {
+                                                this.resetLoading();
+                                                await mondaySdk().execute("notice", {
+                                                    message: '[[${page?.data?.login?.cspError ?: "Error during initialization. Please check your DocSpace CSP settings"}]]',
+                                                    type: "error",
+                                                    timeout: 10000,
+                                                });
+                                                return;
+                                            }
+                                            this.setError();
+                                        },
                                     },
                                 });
                             } else {

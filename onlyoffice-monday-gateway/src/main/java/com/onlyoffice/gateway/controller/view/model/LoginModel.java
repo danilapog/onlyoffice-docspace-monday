@@ -15,4 +15,7 @@ public class LoginModel {
   @Builder.Default private String addressText = "docspace.server.info";
   @Builder.Default private String success = "Login successful";
   @Builder.Default private String error = "Login failed";
+
+  @Builder.Default
+  private String cspError = "Error during initialization. Please check your DocSpace CSP settings";
 }

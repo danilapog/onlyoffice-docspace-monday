@@ -54,14 +54,18 @@ public class SettingsController {
       MDC.put("user_id", String.valueOf(user.getUserId()));
       log.info("User attempts to persist login information");
 
-      userService.registerUser(
-          RegisterUser.builder()
-              .mondayId(user.getUserId())
-              .tenantId(user.getAccountId())
-              .docSpaceId(body.getDocSpaceUserId())
-              .email(body.getDocSpaceEmail())
-              .hash(encryptionService.encrypt(body.getDocSpaceHash()))
-              .build());
+      var response =
+          userService.registerUser(
+              RegisterUser.builder()
+                  .mondayId(user.getUserId())
+                  .tenantId(user.getAccountId())
+                  .docSpaceId(body.getDocSpaceUserId())
+                  .email(body.getDocSpaceEmail())
+                  .hash(encryptionService.encrypt(body.getDocSpaceHash()))
+                  .build());
+
+      if (!response.getStatusCode().is2xxSuccessful())
+        return ResponseEntity.status(response.getStatusCode()).header("HX-Refresh", "true").build();
 
       return ResponseEntity.status(HttpStatus.OK).header("HX-Refresh", "true").build();
     } finally {
