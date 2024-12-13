@@ -28,6 +28,9 @@
                 email: "",
                 password: "",
                 error: false,
+                loginError: "[[${page?.data?.login?.error}]]",
+                loginSuccess: "[[${page?.data?.login?.success}]]",
+                cspError: "[[${page?.data?.login?.cspError}]]",
                 setError() {
                     this.error = true;
                     this.loading = false;
@@ -79,13 +82,13 @@
                             if (!response.ok) {
                                 this.setError();
                                 await monday.execute("notice", {
-                                    message: '[[${page?.data?.login?.error ?: "Login failed"}]]',
+                                    message: this.loginError,
                                     type: "error",
                                     timeout: 10000,
                                 });
                             } else {
                                 await monday.execute("notice", {
-                                    message: '[[${page?.data?.login?.success ?: "Login successful"}]]',
+                                    message: this.loginSuccess,
                                     type: "success",
                                     timeout: 10000,
                                 });
@@ -128,7 +131,7 @@
                                             if (/\(CSP\)/.test(error)) {
                                                 this.resetLoading();
                                                 await mondaySdk().execute("notice", {
-                                                    message: '[[${page?.data?.login?.cspError ?: "Error during initialization. Please check your DocSpace CSP settings"}]]',
+                                                    message: this.cspError,
                                                     type: "error",
                                                     timeout: 10000,
                                                 });
