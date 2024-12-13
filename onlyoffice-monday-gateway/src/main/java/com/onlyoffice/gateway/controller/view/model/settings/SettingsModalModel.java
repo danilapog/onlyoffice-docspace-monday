@@ -15,4 +15,7 @@ public class SettingsModalModel {
 
   @Builder.Default private String changeText = "Change";
   @Builder.Default private String cancelText = "Cancel";
+
+  @Builder.Default
+  private String changeError = "Could not remove current DocSpace data. Please try again later";
 }

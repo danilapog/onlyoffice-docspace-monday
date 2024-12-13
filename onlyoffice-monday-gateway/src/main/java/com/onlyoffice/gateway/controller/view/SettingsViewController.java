@@ -181,6 +181,7 @@ public class SettingsViewController {
         .agreementText(messageService.getMessage("pages.settings.modal.agreementText"))
         .changeText(messageService.getMessage("pages.settings.modal.changeText"))
         .cancelText(messageService.getMessage("pages.settings.modal.cancelText"))
+        .changeError(messageService.getMessage("pages.settings.modal.changeError"))
         .build();
   }
 

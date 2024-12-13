@@ -5,10 +5,33 @@
                 close() {
                     this.modalOpened = false;
                 },
-                change() {
-                    this.disabled = true;
-                    htmx.ajax('GET', `/views/settings/change`, { target: '#content', swap: 'innerHTML' });
-                    this.disabled = false;
+                async change() {
+                    try {
+                        this.disabled = true;
+                        const response = await fetch('/api/1.0/settings', {
+                            method: 'DELETE',
+                        });
+
+                        if (response.ok)
+                            await htmx.ajax('GET', `/views/settings/change`, {
+                                target: '#content',
+                                swap: 'innerHTML'
+                            });
+                        else
+                            mondaySdk().execute('notice', {
+                                message: this.changeError,
+                                type: 'error',
+                                timeout: 10000,
+                            });
+                    } catch (error) {
+                        mondaySdk().execute('notice', {
+                            message: this.changeError,
+                            type: 'error',
+                            timeout: 10000,
+                        });
+                    } finally {
+                        this.disabled = false;
+                    }
                 },
                 init() {
                     this.disabled = false;

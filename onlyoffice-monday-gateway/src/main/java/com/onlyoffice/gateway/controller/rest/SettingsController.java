@@ -5,6 +5,7 @@ import com.onlyoffice.common.client.notification.transfer.event.NotificationEven
 import com.onlyoffice.common.client.notification.transfer.event.TenantChanged;
 import com.onlyoffice.common.service.encryption.EncryptionService;
 import com.onlyoffice.common.tenant.transfer.request.command.RegisterTenant;
+import com.onlyoffice.common.tenant.transfer.request.command.RemoveTenant;
 import com.onlyoffice.common.user.transfer.request.command.RegisterUser;
 import com.onlyoffice.gateway.client.TenantServiceClient;
 import com.onlyoffice.gateway.client.UserServiceClient;
@@ -19,10 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 // TODO: MDC Aspect
 @Slf4j
@@ -103,6 +101,21 @@ public class SettingsController {
       log.debug("Tenant changed notification has been sent");
 
       return ResponseEntity.ok().header("HX-Refresh", "true").build();
+    } finally {
+      MDC.clear();
+    }
+  }
+
+  @DeleteMapping
+  @Secured("ROLE_ADMIN")
+  public ResponseEntity<?> removeTenant(
+      @AuthenticationPrincipal MondayAuthenticationPrincipal user) {
+    try {
+      MDC.put("tenant_id", String.valueOf(user.getAccountId()));
+      MDC.put("user_id", String.valueOf(user.getUserId()));
+      log.info("User attempts to save change DocSpace tenant");
+      return tenantService.removeTenant(
+          RemoveTenant.builder().tenantId(user.getAccountId()).build());
     } finally {
       MDC.clear();
     }

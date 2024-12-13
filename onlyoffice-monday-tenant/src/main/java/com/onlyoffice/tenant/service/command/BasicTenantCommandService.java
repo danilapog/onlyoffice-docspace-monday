@@ -86,7 +86,7 @@ public class BasicTenantCommandService implements TenantCommandService {
     }
   }
 
-  @CacheEvict(value = "tenants", key = "#command.id")
+  @CacheEvict(value = "tenants", key = "#command.tenantId")
   @Transactional(timeout = 2, rollbackFor = Exception.class)
   public boolean remove(RemoveTenant command) {
     var tenant = tenantRepository.getReferenceById(command.getTenantId());
@@ -109,7 +109,7 @@ public class BasicTenantCommandService implements TenantCommandService {
       log.warn("Could not perform json serialization", e);
       return false;
     } catch (Exception e) {
-      log.error("Could not remove current tenant", e);
+      log.warn("Could not remove current tenant", e);
       return false;
     } finally {
       MDC.clear();
