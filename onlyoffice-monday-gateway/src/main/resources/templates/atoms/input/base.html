@@ -1,5 +1,9 @@
 <template x-component="input">
     <input
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="none"
+            spellcheck="false"
             x-data="() => ({
                 valid: true,
                 classes: $el.parentNode?.getAttribute('classes') || '',

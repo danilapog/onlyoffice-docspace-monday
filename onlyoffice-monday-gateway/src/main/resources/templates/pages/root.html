@@ -100,6 +100,16 @@
             Alpine.store('htmxEventManager', {
                 listeners: [],
                 namedListeners: new Map(),
+                sanitizeUrl(url) {
+                    if (!url) return "";
+                    const trimmedUrl = url.trim();
+                    const match = trimmedUrl.match(/^(https?:\/\/)/i);
+                    const protocol = match ? match[1] : '';
+                    let plainUrl = trimmedUrl.replace(/^(https?:\/\/)/i, '');
+                    plainUrl = plainUrl.replace(/\/+$/, '');
+                    plainUrl = plainUrl.trim();
+                    return protocol + plainUrl;
+                },
                 addListener(event, handler) {
                     htmx.on(event, handler);
                     this.listeners.push({ event, handler });
