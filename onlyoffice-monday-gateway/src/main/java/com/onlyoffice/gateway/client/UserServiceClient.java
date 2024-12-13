@@ -14,8 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @FeignClient(
     name = "${spring.cloud.feign.client.onlyoffice-user-name}",
     configuration = UserServiceClientConfiguration.class,
-    fallbackFactory = UserServiceClientFallbackFactory.class
-)
+    fallbackFactory = UserServiceClientFallbackFactory.class)
 public interface UserServiceClient {
   @GetMapping("/users/{tenantId}/{mondayId}")
   @Retry(name = "userServiceQueryRetry")

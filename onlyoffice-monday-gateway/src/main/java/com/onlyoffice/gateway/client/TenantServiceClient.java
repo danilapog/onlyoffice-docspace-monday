@@ -13,8 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @FeignClient(
     name = "${spring.cloud.feign.client.onlyoffice-tenant-name}",
     configuration = TenantServiceClientConfiguration.class,
-    fallbackFactory = TenantServiceClientFallbackFactory.class
-)
+    fallbackFactory = TenantServiceClientFallbackFactory.class)
 public interface TenantServiceClient {
   @PostMapping("/tenants")
   @Retry(name = "tenantServiceCommandRetry")

@@ -29,6 +29,7 @@ public class RoomController {
     this.messagePublisher = factory.getPublisher("notifications");
   }
 
+  @Secured("ROLE_ADMIN")
   @PostMapping(consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
   public ResponseEntity<?> createRoom(
       @AuthenticationPrincipal MondayAuthenticationPrincipal user,
@@ -66,8 +67,8 @@ public class RoomController {
     }
   }
 
-  @DeleteMapping("/{boardId}")
   @Secured("ROLE_ADMIN")
+  @DeleteMapping("/{boardId}")
   public ResponseEntity<?> unlinkRoom(
       @AuthenticationPrincipal MondayAuthenticationPrincipal user, @PathVariable long boardId) {
     try {

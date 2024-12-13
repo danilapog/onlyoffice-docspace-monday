@@ -56,6 +56,13 @@ public class SettingsViewController {
     var tenantExists =
         tenantResponse.getStatusCode().is2xxSuccessful() && tenantResponse.getBody() != null;
 
+    if (tenantResponse.getStatusCode().is5xxServerError())
+      return renderErrorView(
+          messageService.getMessage("pages.errors.unavailable.header"),
+          messageService.getMessage("pages.errors.unavailable.subtext"),
+          TemplateLocation.SERVER_ERROR.getPath(),
+          partial);
+
     if (!tenantExists) {
       return user.isAdmin()
           ? renderAdminConfigureView(user.getSlug(), partial)

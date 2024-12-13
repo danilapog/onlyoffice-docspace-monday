@@ -1,7 +1,6 @@
 package com.onlyoffice.tenant.client;
 
 import com.onlyoffice.common.user.transfer.response.DocSpaceUsers;
-import com.onlyoffice.tenant.exception.UserServiceException;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import java.util.Set;
@@ -16,20 +15,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient(
     name = "${spring.cloud.feign.client.onlyoffice-user-name}",
     configuration = UserServiceClientConfiguration.class,
-    fallbackFactory = UserServiceClientFallbackFactory.class
-)
+    fallbackFactory = UserServiceClientFallbackFactory.class)
 public interface UserServiceClient {
   @GetMapping("/users/{tenantId}")
   @Retry(name = "userServiceRetry")
-  @CircuitBreaker(name = "userServiceCircuitBreaker", fallbackMethod = "findDocSpaceUsersFallback")
+  @CircuitBreaker(name = "userServiceCircuitBreaker")
   ResponseEntity<DocSpaceUsers> findDocSpaceUsers(
       @PathVariable long tenantId, @RequestParam("id") Set<String> ids);
 
   @GetMapping("/users/{tenantId}")
   @Retry(name = "userServiceRetry")
-  @CircuitBreaker(
-      name = "userServiceCircuitBreaker",
-      fallbackMethod = "findDocSpaceUsersWithTimeoutFallback")
+  @CircuitBreaker(name = "userServiceCircuitBreaker")
   ResponseEntity<DocSpaceUsers> findDocSpaceUsers(
       @PathVariable long tenantId,
       @RequestParam("id") Set<String> ids,

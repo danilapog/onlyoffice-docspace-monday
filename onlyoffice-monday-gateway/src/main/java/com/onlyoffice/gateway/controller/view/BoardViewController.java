@@ -18,15 +18,14 @@ import io.micrometer.context.ContextExecutorService;
 import io.micrometer.context.ContextSnapshotFactory;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -79,13 +78,31 @@ public class BoardViewController implements InitializingBean, DisposableBean {
       long boardId, MondayAuthenticationPrincipal user, boolean partial) {
     try {
       var userCredentials = getUserCredentials(user);
-      var tenantCredentials = getTenantCredentials(user);
-      var boardInformation = getBoardInformation(boardId);
+      var tenantFuture = getTenantCredentials(user);
+      var boardFuture = getBoardInformation(boardId);
+      CompletableFuture.allOf(tenantFuture, boardFuture).join();
 
-      if (tenantCredentials == null) {
-        return handleTenantNotFound(user, partial);
-      }
+      var tenantCredentialsResponse = tenantFuture.get();
+      var boardInformationResponse = boardFuture.get();
+      if (tenantCredentialsResponse.getStatusCode().is5xxServerError()
+          || boardInformationResponse.getStatusCode().is5xxServerError())
+        return renderView(
+            partial,
+            TemplateLocation.SERVER_ERROR.getPath(),
+            ErrorPageModel.builder()
+                .refresh("/views/settings/refresh")
+                .login(buildLoginModel(null, null))
+                .error(
+                    ErrorPageModel.ErrorText.builder()
+                        .header(messageService.getMessage("pages.errors.unavailable.header"))
+                        .subtext(messageService.getMessage("pages.errors.unavailable.subtext"))
+                        .build())
+                .build());
 
+      var tenantCredentials = tenantCredentialsResponse.getBody();
+      if (tenantCredentials == null) return handleTenantNotFound(user, partial);
+
+      var boardInformation = boardInformationResponse.getBody();
       if (boardInformation == null) {
         return user.isAdmin()
             ? renderCreateRoomView(userCredentials, tenantCredentials, partial)
@@ -94,7 +111,7 @@ public class BoardViewController implements InitializingBean, DisposableBean {
 
       counter.increment();
       return renderDocSpaceBoardView(tenantCredentials, userCredentials, boardInformation, partial);
-    } catch (CompletionException e) {
+    } catch (CompletionException | InterruptedException | ExecutionException e) {
       return handleServerError(user, partial);
     } catch (RuntimeException e) {
       log.error("Could not render board page", e);
@@ -112,20 +129,21 @@ public class BoardViewController implements InitializingBean, DisposableBean {
               }
               return response.getBody();
             })
+        .exceptionally(
+            (ex) -> UserCredentials.builder().email(Strings.EMPTY).hash(Strings.EMPTY).build())
         .join();
   }
 
-  private TenantCredentials getTenantCredentials(MondayAuthenticationPrincipal user) {
+  private CompletableFuture<ResponseEntity<TenantCredentials>> getTenantCredentials(
+      MondayAuthenticationPrincipal user) {
     return CompletableFuture.supplyAsync(
             () -> tenantService.findTenant(user.getAccountId()), executor)
-        .join()
-        .getBody();
+        .exceptionally((ex) -> ResponseEntity.internalServerError().build());
   }
 
-  private BoardInformation getBoardInformation(long boardId) {
+  private CompletableFuture<ResponseEntity<BoardInformation>> getBoardInformation(long boardId) {
     return CompletableFuture.supplyAsync(() -> tenantService.findBoard(boardId), executor)
-        .join()
-        .getBody();
+        .exceptionally((ex) -> ResponseEntity.internalServerError().build());
   }
 
   private ModelAndView handleTenantNotFound(MondayAuthenticationPrincipal user, boolean partial) {
@@ -258,6 +276,7 @@ public class BoardViewController implements InitializingBean, DisposableBean {
         .hash(userCredentials != null ? userCredentials.getHash() : "")
         .success(messageService.getMessage("pages.settings.configure.login.success"))
         .error(messageService.getMessage("pages.settings.configure.login.error"))
+        .cspError(messageService.getMessage("pages.settings.configure.login.cspError"))
         .build();
   }
 

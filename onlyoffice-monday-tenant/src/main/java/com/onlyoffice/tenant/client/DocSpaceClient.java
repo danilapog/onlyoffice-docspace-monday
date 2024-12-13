@@ -6,7 +6,6 @@ import com.onlyoffice.common.docspace.transfer.response.GenericResponse;
 import com.onlyoffice.common.docspace.transfer.response.MembersAccess;
 import com.onlyoffice.common.docspace.transfer.response.RoomLink;
 import com.onlyoffice.common.docspace.transfer.response.UserToken;
-import com.onlyoffice.tenant.exception.DocSpaceServiceException;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
@@ -18,34 +17,27 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cloud.openfeign.FeignClient;
 
 // TODO: Distributed caching in v2?
-@FeignClient(
-        name = "docSpaceClient",
-        fallbackFactory = DocSpaceClientFallbackFactory.class
-)
+@FeignClient(name = "docSpaceClient", fallbackFactory = DocSpaceClientFallbackFactory.class)
 public interface DocSpaceClient {
   @Cacheable(value = "userTokens", key = "#command.userName")
   @RequestLine("POST /api/2.0/authentication")
   @Headers("Content-Type: application/json")
   @Retry(name = "docSpaceClientRetry")
-  @CircuitBreaker(name = "docSpaceClientCircuitBreaker", fallbackMethod = "generateTokenFallback")
+  @CircuitBreaker(name = "docSpaceClientCircuitBreaker")
   GenericResponse<UserToken> generateToken(URI baseUri, AuthenticateUser command);
 
   @Cacheable(value = "roomLinks", key = "#roomId")
   @RequestLine("GET /api/2.0/files/rooms/{roomId}/links?type=1")
   @Headers({"Authorization: {token}", "Content-Type: application/json"})
   @Retry(name = "docSpaceClientRetry")
-  @CircuitBreaker(
-      name = "docSpaceClientCircuitBreaker",
-      fallbackMethod = "generateSharedKeyFallback")
+  @CircuitBreaker(name = "docSpaceClientCircuitBreaker")
   GenericResponse<List<RoomLink>> generateSharedKey(
       URI baseUri, @Param("roomId") long roomId, @Param("token") String token);
 
   @RequestLine("PUT /api/2.0/files/rooms/{roomId}/share")
   @Headers({"Authorization: {token}", "Content-Type: application/json"})
   @Retry(name = "docSpaceClientRetry")
-  @CircuitBreaker(
-      name = "docSpaceClientCircuitBreaker",
-      fallbackMethod = "changeRoomAccessFallback")
+  @CircuitBreaker(name = "docSpaceClientCircuitBreaker")
   GenericResponse<MembersAccess> changeRoomAccess(
       URI baseUri,
       @Param("roomId") long roomId,
