@@ -18,7 +18,10 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cloud.openfeign.FeignClient;
 
 // TODO: Distributed caching in v2?
-@FeignClient(name = "docSpaceClient")
+@FeignClient(
+        name = "docSpaceClient",
+        fallbackFactory = DocSpaceClientFallbackFactory.class
+)
 public interface DocSpaceClient {
   @Cacheable(value = "userTokens", key = "#command.userName")
   @RequestLine("POST /api/2.0/authentication")
@@ -48,19 +51,4 @@ public interface DocSpaceClient {
       @Param("roomId") long roomId,
       @Param("token") String token,
       ChangeRoomAccess command);
-
-  default GenericResponse<UserToken> generateTokenFallback(
-      URI baseUri, AuthenticateUser command, Exception ex) {
-    throw new DocSpaceServiceException("Could not generate authentication token", ex);
-  }
-
-  default GenericResponse<List<RoomLink>> generateSharedKeyFallback(
-      URI baseUri, long roomId, String token, Exception ex) {
-    throw new DocSpaceServiceException("Could not generate shared key for room " + roomId, ex);
-  }
-
-  default GenericResponse<MembersAccess> changeRoomAccessFallback(
-      URI baseUri, long roomId, String token, ChangeRoomAccess command, Exception ex) {
-    throw new DocSpaceServiceException("Could not change room access for room " + roomId, ex);
-  }
 }

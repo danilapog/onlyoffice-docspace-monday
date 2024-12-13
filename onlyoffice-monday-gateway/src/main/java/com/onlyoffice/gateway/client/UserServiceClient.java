@@ -13,17 +13,19 @@ import org.springframework.web.bind.annotation.*;
 // TODO: Distributed Caching in v2?
 @FeignClient(
     name = "${spring.cloud.feign.client.onlyoffice-user-name}",
-    configuration = UserServiceClientConfiguration.class)
+    configuration = UserServiceClientConfiguration.class,
+    fallbackFactory = UserServiceClientFallbackFactory.class
+)
 public interface UserServiceClient {
   @GetMapping("/users/{tenantId}/{mondayId}")
   @Retry(name = "userServiceQueryRetry")
-  @CircuitBreaker(name = "userServiceCircuitBreaker", fallbackMethod = "findUserFallback")
+  @CircuitBreaker(name = "userServiceCircuitBreaker")
   ResponseEntity<UserCredentials> findUser(
       @PathVariable long tenantId, @PathVariable long mondayId);
 
   @GetMapping("/users/{tenantId}/{mondayId}")
   @Retry(name = "userServiceQueryRetry")
-  @CircuitBreaker(name = "userServiceCircuitBreaker", fallbackMethod = "findUserFallback")
+  @CircuitBreaker(name = "userServiceCircuitBreaker")
   ResponseEntity<UserCredentials> findUser(
       @PathVariable long tenantId,
       @PathVariable long mondayId,
@@ -31,13 +33,13 @@ public interface UserServiceClient {
 
   @GetMapping("/users/{tenantId}")
   @Retry(name = "userServiceQueryRetry")
-  @CircuitBreaker(name = "userServiceCircuitBreaker", fallbackMethod = "findDocSpaceUsersFallback")
+  @CircuitBreaker(name = "userServiceCircuitBreaker")
   ResponseEntity<DocSpaceUsers> findDocSpaceUsers(
       @PathVariable("tenantId") long tenantId, @RequestParam("id") Set<Long> ids);
 
   @GetMapping("/users/{tenantId}")
   @Retry(name = "userServiceQueryRetry")
-  @CircuitBreaker(name = "userServiceCircuitBreaker", fallbackMethod = "findDocSpaceUsersFallback")
+  @CircuitBreaker(name = "userServiceCircuitBreaker")
   ResponseEntity<DocSpaceUsers> findDocSpaceUsers(
       @PathVariable("tenantId") long tenantId,
       @RequestParam("id") Set<Long> ids,
@@ -45,30 +47,6 @@ public interface UserServiceClient {
 
   @PostMapping("/users")
   @Retry(name = "userServiceCommandRetry")
-  @CircuitBreaker(name = "userServiceCircuitBreaker", fallbackMethod = "registerUserFallback")
+  @CircuitBreaker(name = "userServiceCircuitBreaker")
   ResponseEntity<?> registerUser(@RequestBody RegisterUser command);
-
-  default ResponseEntity<UserCredentials> findUserFallback(
-      long tenantId, long mondayId, Exception ex) {
-    return ResponseEntity.badRequest().build();
-  }
-
-  default ResponseEntity<UserCredentials> findUserFallback(
-      long tenantId, long mondayId, int timeout, Exception ex) {
-    return ResponseEntity.badRequest().build();
-  }
-
-  default ResponseEntity<DocSpaceUsers> findDocSpaceUsersFallback(
-      long tenantId, Set<Long> ids, Exception ex) {
-    return ResponseEntity.badRequest().build();
-  }
-
-  default ResponseEntity<DocSpaceUsers> findDocSpaceUsersFallback(
-      long tenantId, Set<Long> ids, int timeout) {
-    return ResponseEntity.badRequest().build();
-  }
-
-  default ResponseEntity<?> registerUserFallback(RegisterUser command, Exception ex) {
-    return ResponseEntity.badRequest().build();
-  }
 }

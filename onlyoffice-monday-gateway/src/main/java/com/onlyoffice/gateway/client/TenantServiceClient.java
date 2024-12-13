@@ -12,69 +12,42 @@ import org.springframework.web.bind.annotation.*;
 // TODO: Distributed Caching in v2?
 @FeignClient(
     name = "${spring.cloud.feign.client.onlyoffice-tenant-name}",
-    configuration = TenantServiceClientConfiguration.class)
+    configuration = TenantServiceClientConfiguration.class,
+    fallbackFactory = TenantServiceClientFallbackFactory.class
+)
 public interface TenantServiceClient {
   @PostMapping("/tenants")
   @Retry(name = "tenantServiceCommandRetry")
-  @CircuitBreaker(name = "tenantServiceCircuitBreaker", fallbackMethod = "createTenantFallback")
+  @CircuitBreaker(name = "tenantServiceCircuitBreaker")
   ResponseEntity<TenantCredentials> createTenant(@RequestBody RegisterTenant command);
 
   @GetMapping("/tenants/{tenantId}")
   @Retry(name = "tenantServiceQueryRetry")
-  @CircuitBreaker(name = "tenantServiceCircuitBreaker", fallbackMethod = "findTenantFallback")
+  @CircuitBreaker(name = "tenantServiceCircuitBreaker")
   ResponseEntity<TenantCredentials> findTenant(@PathVariable long tenantId);
 
   @GetMapping("/tenants/boards/{boardId}")
   @Retry(name = "tenantServiceQueryRetry")
-  @CircuitBreaker(name = "tenantServiceCircuitBreaker", fallbackMethod = "findBoardFallback")
+  @CircuitBreaker(name = "tenantServiceCircuitBreaker")
   ResponseEntity<BoardInformation> findBoard(@PathVariable long boardId);
 
   @PostMapping("/tenants/boards/room")
   @Retry(name = "tenantServiceCommandRetry")
-  @CircuitBreaker(name = "tenantServiceCircuitBreaker", fallbackMethod = "createRoomFallback")
+  @CircuitBreaker(name = "tenantServiceCircuitBreaker")
   ResponseEntity<?> createRoom(@RequestBody RegisterRoom command);
 
   @DeleteMapping("/tenants/boards/room")
   @Retry(name = "tenantServiceCommandRetry")
-  @CircuitBreaker(name = "tenantServiceCircuitBreaker", fallbackMethod = "removeRoomFallback")
+  @CircuitBreaker(name = "tenantServiceCircuitBreaker")
   ResponseEntity<?> removeRoom(@RequestBody RemoveRoom command);
 
   @DeleteMapping("/tenants")
   @Retry(name = "tenantServiceCommandRetry")
-  @CircuitBreaker(name = "tenantServiceCircuitBreaker", fallbackMethod = "removeTenantFallback")
+  @CircuitBreaker(name = "tenantServiceCircuitBreaker")
   ResponseEntity<?> removeTenant(@RequestBody RemoveTenant command);
 
   @PostMapping("/tenants/docspace")
   @Retry(name = "tenantServiceCommandRetry")
-  @CircuitBreaker(name = "tenantServiceCircuitBreaker", fallbackMethod = "updateDocSpaceFallback")
+  @CircuitBreaker(name = "tenantServiceCircuitBreaker")
   ResponseEntity<?> updateDocSpace(@RequestBody RegisterDocSpace command);
-
-  default ResponseEntity<TenantCredentials> createTenantFallback(
-      RegisterTenant command, Exception ex) {
-    return ResponseEntity.badRequest().build();
-  }
-
-  default ResponseEntity<TenantCredentials> findTenantFallback(long tenantId, Exception ex) {
-    return ResponseEntity.badRequest().build();
-  }
-
-  default ResponseEntity<BoardInformation> findBoardFallback(long boardId, Exception ex) {
-    return ResponseEntity.badRequest().build();
-  }
-
-  default ResponseEntity<?> createRoomFallback(RegisterRoom command, Exception ex) {
-    return ResponseEntity.badRequest().build();
-  }
-
-  default ResponseEntity<?> removeRoomFallback(RemoveRoom command, Exception ex) {
-    return ResponseEntity.badRequest().build();
-  }
-
-  default ResponseEntity<?> removeTenantFallback(RemoveTenant command, Exception ex) {
-    return ResponseEntity.badRequest().build();
-  }
-
-  default ResponseEntity<?> updateDocSpaceFallback(RegisterDocSpace command, Exception ex) {
-    return ResponseEntity.badRequest().build();
-  }
 }

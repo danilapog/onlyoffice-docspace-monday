@@ -94,9 +94,9 @@ public class SettingsController {
                   .adminHash(encryptionService.encrypt(body.getDocSpaceHash()))
                   .build());
 
-      if (response.getBody() == null || response.getBody().getId() < 1) {
-        log.error("Could not save tenant DocSpace credentials due to empty response body");
-        return ResponseEntity.badRequest().build();
+      if (!response.getStatusCode().is2xxSuccessful()) {
+        log.error("Could not save tenant DocSpace credentials");
+        return ResponseEntity.status(response.getStatusCode()).build();
       }
 
       messagePublisher.accept(TenantChanged.builder().tenantId(user.getAccountId()).build());
