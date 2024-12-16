@@ -7,6 +7,39 @@
             font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
         }
         [x-cloak] { display: none !important; }
+        #content,
+        #small-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        #content {
+            display: block;
+        }
+        #small-content {
+            display: none;
+        }
+        .small-content-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            max-width: 354px;
+            margin: 0 auto;
+            width: 100%;
+            gap: 1rem;
+        }
+        @media (max-width: 444px) {
+            #content {
+                display: none;
+            }
+            #small-content {
+                display: flex;
+                padding: 1.5rem;
+            }
+        }
     </style>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/monday-sdk-js/dist/main.js"></script>
@@ -28,6 +61,8 @@
                 persistedHash: '[[${page?.data?.login?.hash}]]',
                 loginError: '[[${page?.data?.login?.error}]]',
                 cspError: '[[${page?.data?.login?.cspError}]]',
+                sizeHeaderError: '[[${page?.data?.login?.sizeHeaderError}]]',
+                sizeHeaderText: '[[${page?.data?.login?.sizeHeaderText}]]',
                 fetchTranslated: async () => {
                     const monday = mondaySdk();
                     const { appFeature, boardId, user } = (await monday.get("context")).data;
@@ -168,8 +203,25 @@
     <div x-show="!rootReady" class="h-full w-full flex justify-center items-center">
         <x-basic-spinner classes="w-16 h-16"></x-basic-spinner>
     </div>
-    <section id="content" x-show="rootReady" x-cloak class="h-full w-full" x-data="webSocketConfiguration" hx-ext="ws">
-    </section>
+    <div x-show="rootReady" x-cloak class="relative h-full w-full">
+        <section id="content" class="h-full w-full" x-data="webSocketConfiguration" hx-ext="ws">
+        </section>
+        <section id="small-content" class="absolute inset-0 hidden bg-white">
+            <div class="flex flex-col items-center justify-center w-full max-w-[354px] mx-auto py-[265px] font-['Open_Sans',_-apple-system,_Roboto,_Helvetica,_sans-serif] text-center">
+                <div class="w-[150px] max-w-full">
+                    <div th:insert="~{atoms/logo/svg/small}"></div>
+                </div>
+                <div class="mt-5 w-[285px] max-w-full flex flex-col items-stretch justify-center">
+                    <span x-text="sizeHeaderError"
+                          class="text-base font-bold leading-[22px]"
+                    ></span>
+                    <span x-text="sizeHeaderText"
+                          class="mt-2 text-xs text-subtext font-normal leading-[16px]"
+                    ></span>
+                </div>
+            </div>
+        </section>
+    </div>
 </body>
 <script>
     const initComponents = () => document.querySelectorAll('[x-component]').forEach(component => {

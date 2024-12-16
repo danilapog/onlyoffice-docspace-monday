@@ -218,6 +218,10 @@ public class BoardViewController implements InitializingBean, DisposableBean {
                     .error(messageService.getMessage("pages.settings.configure.login.error"))
                     .success(messageService.getMessage("pages.settings.configure.login.success"))
                     .cspError(messageService.getMessage("pages.settings.configure.login.cspError"))
+                    .sizeHeaderError(
+                        messageService.getMessage("pages.settings.configure.login.sizeHeaderError"))
+                    .sizeHeaderText(
+                        messageService.getMessage("pages.settings.configure.login.sizeHeaderText"))
                     .build())
             .information(buildSettingsConfigureInformationModel(user))
             .build();
@@ -277,6 +281,9 @@ public class BoardViewController implements InitializingBean, DisposableBean {
         .success(messageService.getMessage("pages.settings.configure.login.success"))
         .error(messageService.getMessage("pages.settings.configure.login.error"))
         .cspError(messageService.getMessage("pages.settings.configure.login.cspError"))
+        .sizeHeaderError(
+            messageService.getMessage("pages.settings.configure.login.sizeHeaderError"))
+        .sizeHeaderText(messageService.getMessage("pages.settings.configure.login.sizeHeaderText"))
         .build();
   }
 

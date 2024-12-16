@@ -18,4 +18,10 @@ public class LoginModel {
 
   @Builder.Default
   private String cspError = "Error during initialization. Please check your DocSpace CSP settings";
+
+  @Builder.Default
+  private String sizeHeaderError = "Your window is too small to display all page contents";
+
+  @Builder.Default
+  private String sizeHeaderText = "Please resize the window or enable full-screen mode";
 }

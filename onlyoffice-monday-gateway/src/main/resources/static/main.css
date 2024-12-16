@@ -600,6 +600,10 @@ video {
   border-width: 0;
 }
 
+.visible {
+  visibility: visible;
+}
+
 .fixed {
   position: fixed;
 }
@@ -704,6 +708,10 @@ video {
 
 .mt-0 {
   margin-top: 0px;
+}
+
+.mt-5 {
+  margin-top: 1.25rem;
 }
 
 .line-clamp-2 {
@@ -828,6 +836,14 @@ video {
   width: 386px;
 }
 
+.w-\[150px\] {
+  width: 150px;
+}
+
+.w-\[285px\] {
+  width: 285px;
+}
+
 .max-w-72 {
   max-width: 18rem;
 }
@@ -862,6 +878,14 @@ video {
 
 .max-w-\[384px\] {
   max-width: 384px;
+}
+
+.max-w-sm {
+  max-width: 24rem;
+}
+
+.max-w-\[354px\] {
+  max-width: 354px;
 }
 
 .flex-1 {
@@ -1165,6 +1189,11 @@ video {
   padding-bottom: 11px;
 }
 
+.py-\[265px\] {
+  padding-top: 265px;
+  padding-bottom: 265px;
+}
+
 .pb-2 {
   padding-bottom: 0.5rem;
 }
@@ -1187,6 +1216,10 @@ video {
 
 .font-\[\'Open_Sans\'\] {
   font-family: 'Open Sans';
+}
+
+.font-\[\'Open_Sans\'\2c _-apple-system\2c _Roboto\2c _Helvetica\2c _sans-serif\] {
+  font-family: 'Open Sans', -apple-system, Roboto, Helvetica, sans-serif;
 }
 
 .text-lg {
@@ -1232,6 +1265,10 @@ video {
 
 .font-semibold {
   font-weight: 600;
+}
+
+.font-medium {
+  font-weight: 500;
 }
 
 .leading-\[16px\] {
@@ -1302,6 +1339,11 @@ video {
 .text-\[\#A3A9AE\] {
   --tw-text-opacity: 1;
   color: rgb(163 169 174 / var(--tw-text-opacity));
+}
+
+.text-\[\#F74343\] {
+  --tw-text-opacity: 1;
+  color: rgb(247 67 67 / var(--tw-text-opacity));
 }
 
 .opacity-0 {
