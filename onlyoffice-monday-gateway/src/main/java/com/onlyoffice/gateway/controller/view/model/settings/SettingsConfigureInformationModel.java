@@ -10,9 +10,13 @@ import lombok.*;
 public class SettingsConfigureInformationModel {
   @Builder.Default private String csp = "Check the CSP settings";
 
+  @Builder.Default private String credentialsFirst = "Before connecting the app, please go to the";
+
   @Builder.Default
-  private String credentials =
-      "Before connecting the app, please go to the DocSpace Settings - Developer tools - JavaScript SDK and add the following credentials to the allow list:";
+  private String credentialsPath = "DocSpace Settings - Developer tools - JavaScript SDK";
+
+  @Builder.Default
+  private String credentialsSecond = "and add the following credentials to the allow list:";
 
   @Builder.Default private String monday = "Monday portal address:";
   private String mondayAddress;

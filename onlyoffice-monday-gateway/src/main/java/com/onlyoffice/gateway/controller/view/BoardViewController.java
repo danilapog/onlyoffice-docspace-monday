@@ -305,7 +305,12 @@ public class BoardViewController implements InitializingBean, DisposableBean {
       MondayAuthenticationPrincipal user) {
     return SettingsConfigureInformationModel.builder()
         .csp(messageService.getMessage("pages.settings.configure.information.csp"))
-        .credentials(messageService.getMessage("pages.settings.configure.information.credentials"))
+        .credentialsFirst(
+            messageService.getMessage("pages.settings.configure.information.credentialsFirst"))
+        .credentialsPath(
+            messageService.getMessage("pages.settings.configure.information.credentialsPath"))
+        .credentialsSecond(
+            messageService.getMessage("pages.settings.configure.information.credentialsSecond"))
         .monday(messageService.getMessage("pages.settings.configure.information.monday"))
         .mondayAddress(String.format("https://%s.monday.com", user.getSlug()))
         .app(messageService.getMessage("pages.settings.configure.information.app"))
