@@ -14,8 +14,8 @@
                     }
                 }
             }"
-            class="font-bold py-2 px-4 rounded-md w-full focus:outline-none focus:ring-0
-                   disabled:hover:shadow-none disabled:cursor-not-allowed"
+            class="w-full focus:outline-none focus:ring-0
+                   disabled:hover:shadow-none disabled:cursor-not-allowed flex items-center justify-center"
             :class="[
                 $store?.profile?.dark ? 'bg-login-blue text-white disabled:bg-gray-400' : 'bg-login-blue text-white disabled:bg-gray-300',
                 classes
@@ -24,8 +24,14 @@
             aria-pressed="false"
             :type="type"
             :disabled="loading || disabled">
-        <span x-show="!loading" x-text="text"></span>
-        <div x-show="loading" class="w-full h-full flex justify-center items-center">
+        <span
+                x-show="!loading"
+                class="w-full block truncate text-center"
+                x-text="text">
+        </span>
+        <div
+                x-show="loading"
+                class="w-full h-full flex justify-center items-center">
             <x-basic-spinner></x-basic-spinner>
         </div>
     </button>

@@ -176,8 +176,8 @@
         <div style="display: none;">
             <div id="ds-frame"></div>
         </div>
-        <div th:insert="~{atoms/logo/svg/room}" class="mb-6 md:mb-8 lg:mb-10"></div>
-        <div class="mb-4 text-lg md:text-xl lg:text-2xl">
+        <div th:insert="~{atoms/logo/svg/room}" class="mb-5"></div>
+        <div class="mb-2 text-base">
             <x-bold-text
                     classes="font-sans"
                     th:data-text="${page?.data?.creationInformation?.welcomeText} ?: 'Welcome to DocSpace Board!'"
@@ -186,17 +186,17 @@
                     ]"
             ></x-bold-text>
         </div>
-        <div class="mb-4 text-sm md:text-base lg:text-lg">
+        <div class="mb-4 text-xs text-subtext">
             <x-generic-text
                     classes="font-sans"
                     th:data-text="${page?.data?.creationInformation?.createText} ?: 'Please create the room'"
             ></x-generic-text>
         </div>
-        <div class="w-[135px] mx-auto">
+        <div class="w-[135px] h-[32px] mx-auto">
             <x-loader-button
                     th:data-text="${page?.data?.creationInformation?.buttonText} ?: 'Create room'"
                     @click="createRoom"
-                    classes="p-2 w-full font-sans"
+                    classes="font-bold py-2 px-7 w-full h-full rounded-[3px] text-xs"
                     :disabled="disabled"
                     :loading="loading"
             ></x-loader-button>
