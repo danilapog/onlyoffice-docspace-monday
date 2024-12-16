@@ -12,6 +12,10 @@ public class SettingsLoginFormModel {
   @Builder.Default private String changeText = "Change DocSpace";
 
   @Builder.Default
+  private String disclaimer =
+      "By clicking this button, you agree that rooms will be created in DocSpace on your behalf, room tags will be created, users will be invited to rooms and users will be created in DocSpace";
+
+  @Builder.Default
   private SettingsLoginFormFields fields = SettingsLoginFormFields.builder().build();
 
   @Getter

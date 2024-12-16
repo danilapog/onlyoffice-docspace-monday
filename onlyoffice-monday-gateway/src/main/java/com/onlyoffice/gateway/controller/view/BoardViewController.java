@@ -284,6 +284,7 @@ public class BoardViewController implements InitializingBean, DisposableBean {
     return SettingsLoginFormModel.builder()
         .loginText(messageService.getMessage("pages.settings.configure.field.login"))
         .changeText(messageService.getMessage("pages.settings.configure.field.change"))
+        .disclaimer(messageService.getMessage("pages.settings.modal.disclaimer"))
         .fields(
             SettingsLoginFormModel.SettingsLoginFormFields.builder()
                 .docSpaceLabel(
