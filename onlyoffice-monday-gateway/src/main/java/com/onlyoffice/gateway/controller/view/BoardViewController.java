@@ -176,6 +176,8 @@ public class BoardViewController implements InitializingBean, DisposableBean {
                     .welcomeText(messageService.getMessage("pages.creation.welcomeText"))
                     .createText(messageService.getMessage("pages.creation.createText"))
                     .buttonText(messageService.getMessage("pages.creation.buttonText"))
+                    .noPermissionsText(
+                        messageService.getMessage("pages.creation.noPermissionsText"))
                     .build())
             .roomsQuotaError(messageService.getMessage("pages.creation.roomsQuotaError"))
             .timeoutError(messageService.getMessage("pages.creation.timeoutError"))

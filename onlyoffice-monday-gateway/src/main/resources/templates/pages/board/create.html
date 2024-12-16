@@ -173,33 +173,47 @@
     <main x-data="createRoomData"
           class="min-h-screen w-full flex flex-col justify-center items-center p-4 text-center"
     >
-        <div style="display: none;">
-            <div id="ds-frame"></div>
+        <div x-show="!$store?.profile?.docsAdmin">
+            <div style="display: none;">
+                <div id="ds-frame"></div>
+            </div>
+            <div th:insert="~{atoms/logo/svg/room}" class="mb-5"></div>
+            <div class="mb-2 text-base">
+                <x-bold-text
+                        classes="font-sans"
+                        th:data-text="${page?.data?.creationInformation?.welcomeText}"
+                        :class="[
+                            $store?.profile?.dark ? 'text-white' : ''
+                        ]"
+                ></x-bold-text>
+            </div>
+            <div class="mb-4 text-xs text-subtext">
+                <x-generic-text
+                        classes="font-sans"
+                        th:data-text="${page?.data?.creationInformation?.createText}"
+                ></x-generic-text>
+            </div>
+            <div class="w-[135px] h-[32px] mx-auto">
+                <x-loader-button
+                        th:data-text="${page?.data?.creationInformation?.buttonText}"
+                        @click="createRoom"
+                        classes="font-bold py-2 px-7 w-full h-full rounded-[3px] text-xs"
+                        :disabled="disabled"
+                        :loading="loading"
+                ></x-loader-button>
+            </div>
         </div>
-        <div th:insert="~{atoms/logo/svg/room}" class="mb-5"></div>
-        <div class="mb-2 text-base">
-            <x-bold-text
-                    classes="font-sans"
-                    th:data-text="${page?.data?.creationInformation?.welcomeText} ?: 'Welcome to DocSpace Board!'"
-                    :class="[
-                        $store?.profile?.dark ? 'text-white' : ''
-                    ]"
-            ></x-bold-text>
-        </div>
-        <div class="mb-4 text-xs text-subtext">
-            <x-generic-text
-                    classes="font-sans"
-                    th:data-text="${page?.data?.creationInformation?.createText} ?: 'Please create the room'"
-            ></x-generic-text>
-        </div>
-        <div class="w-[135px] h-[32px] mx-auto">
-            <x-loader-button
-                    th:data-text="${page?.data?.creationInformation?.buttonText} ?: 'Create room'"
-                    @click="createRoom"
-                    classes="font-bold py-2 px-7 w-full h-full rounded-[3px] text-xs"
-                    :disabled="disabled"
-                    :loading="loading"
-            ></x-loader-button>
+        <div x-show="$store?.profile?.docsAdmin" class="flex flex-col justify-center items-center">
+            <div th:replace="~{atoms/logo/svg/stop}"></div>
+            <div class="w-[285px] mt-5 text-center">
+                <x-bold-text
+                        th:data-text="${page?.data?.creationInformation?.noPermissionsText}"
+                        classes="font-sans"
+                        :class="[
+                           $store?.profile?.dark ? 'text-white' : ''
+                        ]"
+                ></x-bold-text>
+            </div>
         </div>
     </main>
 </div>

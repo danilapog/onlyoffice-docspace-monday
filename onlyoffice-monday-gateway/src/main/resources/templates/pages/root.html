@@ -79,7 +79,7 @@
                 },
                 async init() {
                     await this.fetchTranslated();
-                    if (this.persistedUrl && this.persistedEmail && this.persistedHash) {
+                    if (this.persistedUrl) {
                             window.DocSpace.SDK.initSystem({
                                 src: this.persistedUrl,
                                 frameId: 'root-ds',
@@ -87,9 +87,15 @@
                                 events: {
                                     onAppReady: async () => {
                                         try {
-                                            const login = await DocSpace.SDK.frames['root-ds'].login(this.persistedEmail, this.persistedHash);
-                                            if (!login || !login.url)
-                                                throw new Error("Could not log you in. Please make sure that the credentials are valid");
+                                            if (this.persistedEmail && this.persistedHash) {
+                                                const login = await DocSpace.SDK.frames['root-ds'].login(this.persistedEmail, this.persistedHash);
+                                                if (!login || !login.url)
+                                                    throw new Error("Could not log you in. Please make sure that the credentials are valid");
+                                            }
+                                            const me = await DocSpace.SDK.frames['root-ds'].getUserInfo();
+                                            if (!me || !me.id)
+                                                throw new Error("Could not get current profile. Please make sure that the credentials are valid");
+                                            Alpine.store('profile').setDocsAdmin(me.isAdmin);
                                         } catch (error) {
                                              mondaySdk().execute("notice", {
                                                 message: this.loginError,
@@ -128,6 +134,10 @@
             Alpine.store("profile", {
                 lang: "en",
                 dark: false,
+                docsAdmin: false,
+                setDocsAdmin(val) {
+                    this.docsAdmin = val;
+                },
                 async init() {
                     mondaySdk().listen("context", (ctx) => {
                         const { theme, user } = ctx.data;

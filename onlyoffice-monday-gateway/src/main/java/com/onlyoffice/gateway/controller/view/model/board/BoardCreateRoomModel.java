@@ -22,5 +22,8 @@ public class BoardCreateRoomModel {
     @Builder.Default private String welcomeText = "Welcome to DocSpace Board!";
     @Builder.Default private String createText = "Please create the room";
     @Builder.Default private String buttonText = "Create room";
+
+    @Builder.Default
+    private String noPermissionsText = "Sorry, you don't have enough permissions to create a room";
   }
 }
