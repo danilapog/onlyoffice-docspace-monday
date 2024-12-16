@@ -52,9 +52,11 @@
                                 events: {
                                     onAppReady: async () => {
                                         try {
-                                            await DocSpace.SDK.frames['root-ds'].login(this.persistedEmail, this.persistedHash);
+                                            const login = await DocSpace.SDK.frames['root-ds'].login(this.persistedEmail, this.persistedHash);
+                                            if (!login || !login.url)
+                                                throw new Error("Could not log you in. Please make sure that the credentials are valid");
                                         } catch (error) {
-                                             await mondaySdk().execute("notice", {
+                                             mondaySdk().execute("notice", {
                                                 message: this.loginError,
                                                 type: "error",
                                                 timeout: 10000,
