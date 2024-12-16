@@ -173,7 +173,7 @@
     <main x-data="createRoomData"
           class="min-h-screen w-full flex flex-col justify-center items-center p-4 text-center"
     >
-        <div x-show="!$store?.profile?.docsAdmin">
+        <div x-show="$store?.profile?.docsAdmin" class="flex flex-col justify-center items-center">
             <div style="display: none;">
                 <div id="ds-frame"></div>
             </div>
@@ -203,7 +203,7 @@
                 ></x-loader-button>
             </div>
         </div>
-        <div x-show="$store?.profile?.docsAdmin" class="flex flex-col justify-center items-center">
+        <div x-show="!$store?.profile?.docsAdmin" class="flex flex-col justify-center items-center">
             <div th:replace="~{atoms/logo/svg/stop}"></div>
             <div class="w-[285px] mt-5 text-center">
                 <x-bold-text
