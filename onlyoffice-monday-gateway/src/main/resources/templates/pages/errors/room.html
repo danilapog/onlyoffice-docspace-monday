@@ -26,9 +26,14 @@
         }
     </script>
     <template x-data="roomErrorData"></template>
-    <div th:replace="~{atoms/logo/svg/ant}"></div>
+    <div th:replace="~{atoms/logo/svg/horizontal}">
+    </div>
+    <div class="mt-5"
+         th:insert="~{atoms/logo/svg/ant}"
+    ></div>
     <x-error-text
-        th:header="${page?.data?.error?.header} ?: 'Not Found'"
-        th:subtext="${page?.data?.error?.subtext} ?: 'The required room was not found. Please check if the room still exists or contact the administrator.'"
+        th:header="${page?.data?.error?.header}"
+        th:subtext="${page?.data?.error?.subtext}"
+        classes="mt-10"
     ></x-error-text>
 </div>

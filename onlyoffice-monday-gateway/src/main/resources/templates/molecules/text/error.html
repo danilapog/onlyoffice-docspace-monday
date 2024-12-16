@@ -4,7 +4,7 @@
                 subtext: $el.parentNode?.getAttribute('subtext') || '',
                 classes: $el.parentNode?.getAttribute('classes') || ''
             }"
-         class="flex justify-center items-center flex-col max-w-72 mt-10"
+         class="flex justify-center items-center flex-col max-w-72"
          :class="classes"
     >
         <x-bold-text
@@ -16,8 +16,8 @@
                 :text="header"
         ></x-bold-text>
         <x-generic-text
-                class="mb-2 h-1/2 overflow-hidden text-ellipsis w-full"
-                classes="text-xs text-center text-[#555F65] line-clamp-4 font-sans"
+                class="h-1/2 overflow-hidden text-ellipsis w-full"
+                classes="text-xs text-center text-subtext line-clamp-4 font-sans"
                 :text="subtext"
         ></x-generic-text>
     </div>

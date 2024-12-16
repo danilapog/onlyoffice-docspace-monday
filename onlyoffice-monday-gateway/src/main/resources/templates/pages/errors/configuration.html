@@ -30,9 +30,12 @@
     </script>
     <template x-data="configurationErrorData"></template>
     <div th:replace="~{atoms/logo/svg/horizontal}"></div>
-    <div th:replace="~{atoms/logo/svg/owl}"></div>
+    <div class="mt-5"
+         th:insert="~{atoms/logo/svg/owl}">
+    </div>
     <x-error-text
-            th:header="${page?.data?.error?.header} ?: 'Please wait'"
-            th:subtext="${page?.data?.error?.subtext} ?: 'Monday Administrator or Monday Member have to configure plugin first'"
+         th:header="${page?.data?.error?.header}"
+         th:subtext="${page?.data?.error?.subtext}"
+         classes="mt-10"
     ></x-error-text>
 </div>
