@@ -11,7 +11,7 @@
                 <p th:text="${page?.data?.information?.csp} ?: 'Check the CSP settings'"
                    class="flex-1 text-[16px] leading-[1.38] font-semibold"
                    :class="[
-                        $store?.profile?.dark ? 'text-white' : ''
+                        $store?.profile?.dark ? 'text-white' : 'text-dark'
                    ]"
                 ></p>
             </div>
@@ -21,14 +21,14 @@
                             th:text="${page?.data?.information?.credentialsFirst}"
                             class="font-normal"
                             :class="[
-                                $store?.profile?.dark ? 'text-white' : ''
+                                $store?.profile?.dark ? 'text-white' : 'text-dark'
                             ]"
                     ></span>
                     <span
                             th:text="${page?.data?.information?.credentialsPath}"
                             class="font-bold"
                             :class="[
-                                $store?.profile?.dark ? 'text-white': ''
+                                $store?.profile?.dark ? 'text-white': 'text-dark'
                             ]"
                     >
                     </span>
@@ -36,7 +36,7 @@
                             th:text="${page?.data?.information?.credentialsSecond}"
                             class="font-normal"
                             :class="[
-                                $store?.profile?.dark ? 'text-white' : ''
+                                $store?.profile?.dark ? 'text-white' : 'text-dark'
                             ]"
                     ></span>
                 </div>
@@ -46,7 +46,7 @@
                             th:text="${page?.data?.information?.monday} ?: 'Monday portal address:'"
                             class="font-bold"
                             :class="[
-                                $store?.profile?.dark ? 'text-white' : ''
+                                $store?.profile?.dark ? 'text-white' : 'text-dark'
                             ]"
                     ></span>
                     <span
@@ -59,7 +59,7 @@
                             th:text="${page?.data?.information?.app} ?: 'ONLYOFFICE DocSpace app:'"
                             class="font-bold"
                             :class="[
-                                $store?.profile?.dark ? 'text-white' : ''
+                                $store?.profile?.dark ? 'text-white' : 'text-dark'
                             ]"
                     ></span>
                     <span

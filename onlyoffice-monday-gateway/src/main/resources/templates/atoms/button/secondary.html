@@ -12,9 +12,9 @@
             :type="type"
             x-text="text"
             :disabled="disabled"
-            class="border border-gray-300 rounded-md h-11 w-full hover:shadow-lg duration-300 disabled:hover:shadow-none disabled:cursor-not-allowed"
+            class="border border-gray-300 rounded-[3px] h-11 w-full hover:shadow-lg duration-300 disabled:hover:shadow-none disabled:cursor-not-allowed"
             :class="[
-                $store?.profile?.dark ? 'bg-secondary-dark text-white disabled:bg-gray-400' : 'disabled:bg-gray-100',
+                $store?.profile?.dark ? 'bg-secondary-dark text-white disabled:bg-color-disabled-dark' : 'bg-secondary text-dark disabled:bg-color-disabled',
                 classes
             ]"
     >

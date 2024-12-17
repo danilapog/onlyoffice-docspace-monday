@@ -183,7 +183,7 @@
                         classes="font-sans"
                         th:data-text="${page?.data?.creationInformation?.welcomeText}"
                         :class="[
-                            $store?.profile?.dark ? 'text-white' : ''
+                            $store?.profile?.dark ? 'text-white' : 'text-dark'
                         ]"
                 ></x-bold-text>
             </div>
@@ -210,7 +210,7 @@
                         th:data-text="${page?.data?.creationInformation?.noPermissionsText}"
                         classes="font-sans"
                         :class="[
-                           $store?.profile?.dark ? 'text-white' : ''
+                           $store?.profile?.dark ? 'text-white' : 'text-dark'
                         ]"
                 ></x-bold-text>
             </div>

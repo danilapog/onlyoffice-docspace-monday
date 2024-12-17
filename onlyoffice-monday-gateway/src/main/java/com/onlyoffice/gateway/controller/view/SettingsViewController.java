@@ -10,6 +10,7 @@ import com.onlyoffice.gateway.security.MondayAuthenticationPrincipal;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
@@ -108,7 +109,7 @@ public class SettingsViewController {
 
   private SettingsAdminConfigureModel buildAdminConfigureModel(String slug) {
     return SettingsAdminConfigureModel.builder()
-        .login(buildSettingsLoginModel(selfOrigin, slug))
+        .login(buildSettingsLoginModel(Strings.EMPTY, slug))
         .information(buildSettingsConfigureInformationModel(slug))
         .settingsForm(buildSettingsLoginFormModel())
         .build();

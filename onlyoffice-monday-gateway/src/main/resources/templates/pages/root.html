@@ -211,20 +211,28 @@
     <div x-show="!rootReady" class="h-full w-full flex justify-center items-center">
         <x-basic-spinner classes="w-16 h-16"></x-basic-spinner>
     </div>
-    <div x-show="rootReady" x-cloak class="relative h-full w-full">
+    <div x-show="rootReady" x-cloak class="relative h-full w-full" :class="[
+        $store?.profile?.dark ? 'bg-dark' : 'bg-base'
+    ]">
         <section id="content" class="h-full w-full" x-data="webSocketConfiguration" hx-ext="ws">
         </section>
-        <section id="small-content" class="absolute inset-0 hidden bg-white">
-            <div class="flex flex-col items-center justify-center w-full max-w-[354px] mx-auto py-[265px] font-['Open_Sans',_-apple-system,_Roboto,_Helvetica,_sans-serif] text-center">
+        <section id="small-content" class="absolute inset-0 hidden">
+            <div class="flex flex-col items-center justify-center w-full max-w-[354px] mx-auto py-[265px] text-center">
                 <div class="w-[150px] max-w-full">
                     <div th:insert="~{atoms/logo/svg/small}"></div>
                 </div>
                 <div class="mt-5 w-[285px] max-w-full flex flex-col items-stretch justify-center">
                     <span x-text="sizeHeaderError"
                           class="text-base font-bold leading-[22px]"
+                          :class="[
+                            $store?.profile?.dark ? 'text-color-generic-dark-text' : 'text-color-generic-text'
+                          ]"
                     ></span>
                     <span x-text="sizeHeaderText"
                           class="mt-2 text-xs text-subtext font-normal leading-[16px]"
+                          :class="[
+                            $store?.profile?.dark ? 'text-color-generic-dark-text' : 'text-color-generic-text'
+                          ]"
                     ></span>
                 </div>
             </div>

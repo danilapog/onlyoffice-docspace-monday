@@ -12,9 +12,9 @@
             :type="type"
             x-text="text"
             :disabled="disabled"
-            class="rounded-md h-11 w-full mr-2 hover:shadow-lg duration-300 disabled:hover:shadow-none disabled:cursor-not-allowed"
+            class="rounded-[3px] h-11 w-full mr-2 hover:shadow-lg duration-300 disabled:hover:shadow-none disabled:cursor-not-allowed"
             :class="[
-                $store?.profile?.dark ? 'bg-login-blue text-white disabled:bg-gray-400' : 'bg-login-blue text-white disabled:bg-gray-300',
+                $store?.profile?.dark ? 'bg-dark-login-blue text-white disabled:bg-color-disabled-dark' : 'bg-login-blue text-white disabled:bg-color-disabled',
                 classes
             ]"
     >

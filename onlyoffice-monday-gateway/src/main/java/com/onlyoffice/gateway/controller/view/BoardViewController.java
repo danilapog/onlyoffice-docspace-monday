@@ -18,6 +18,7 @@ import io.micrometer.context.ContextExecutorService;
 import io.micrometer.context.ContextSnapshotFactory;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.concurrent.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -69,8 +70,11 @@ public class BoardViewController implements InitializingBean, DisposableBean {
   @GetMapping("/refresh")
   @ResponseBody
   public ModelAndView refreshBoard(
+      HttpServletResponse response,
       @RequestParam("boardId") long boardId,
+      @RequestParam(value = "force", defaultValue = "false") boolean force,
       @AuthenticationPrincipal MondayAuthenticationPrincipal user) {
+    if (force) response.setHeader("HX-Refresh", "true");
     return getBoardView(boardId, user, true);
   }
 
