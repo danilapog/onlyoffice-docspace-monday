@@ -93,9 +93,7 @@
                                                     throw new Error("Could not log you in. Please make sure that the credentials are valid");
                                             }
                                             const me = await DocSpace.SDK.frames['root-ds'].getUserInfo();
-                                            if (!me || !me.id)
-                                                throw new Error("Could not get current profile. Please make sure that the credentials are valid");
-                                            Alpine.store('profile').setDocsAdmin(me.isAdmin);
+                                            Alpine.store('profile').setDocsAdmin(me && me.isAdmin);
                                         } catch (error) {
                                              mondaySdk().execute("notice", {
                                                 message: this.loginError,
