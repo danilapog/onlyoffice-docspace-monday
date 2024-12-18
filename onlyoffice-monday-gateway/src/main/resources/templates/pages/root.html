@@ -88,12 +88,29 @@
                                     onAppReady: async () => {
                                         try {
                                             if (this.persistedEmail && this.persistedHash) {
-                                                const login = await DocSpace.SDK.frames['root-ds'].login(this.persistedEmail, this.persistedHash);
-                                                if (!login || !login.url)
-                                                    throw new Error("Could not log you in. Please make sure that the credentials are valid");
+                                                const baseDelay = 100;
+                                                const maxDelay = 1000;
+                                                for (let attempt = 1; attempt <= 3; attempt++) {
+                                                    try {
+                                                        const login = await DocSpace.SDK.frames['root-ds'].login(this.persistedEmail, this.persistedHash);
+                                                        if (login && login.url) {
+                                                            const me = await DocSpace.SDK.frames['root-ds'].getUserInfo();
+                                                            Alpine.store('profile').setDocsAdmin(me && me.isAdmin);
+                                                            return;
+                                                        }
+                                                    } catch (error) {
+                                                        if (attempt < 3) {
+                                                            const delay = Math.min(baseDelay * Math.pow(2, attempt - 1), maxDelay);
+                                                            await new Promise(resolve => setTimeout(resolve, delay));
+                                                            continue;
+                                                        }
+                                                    }
+                                                }
+                                                throw new Error("Could not log you in. Please make sure that the credentials are valid");
+                                            } else {
+                                                const me = await DocSpace.SDK.frames['root-ds'].getUserInfo();
+                                                Alpine.store('profile').setDocsAdmin(me && me.isAdmin);
                                             }
-                                            const me = await DocSpace.SDK.frames['root-ds'].getUserInfo();
-                                            Alpine.store('profile').setDocsAdmin(me && me.isAdmin);
                                         } catch (error) {
                                              mondaySdk().execute("notice", {
                                                 message: this.loginError,
