@@ -39,6 +39,8 @@
                 toggleSubmit() {
                     this.disabled = true;
                     this.loading = true;
+                    this.url = Alpine.store('htmxEventManager').sanitizeUrl(this.url);
+                    this.email = this.email.trim();
                 },
                 resetLoading() {
                     this.loading = false;
