@@ -43,6 +43,8 @@
                                             name
                                             subscribers {
                                               id
+                                              is_guest
+                                              is_view_only
                                             }
                                         }
                                     }
@@ -54,7 +56,8 @@
                                     return;
                                 }
 
-                                const ids = board.subscribers.map(subscriber => subscriber.id);
+                                const ids = board.subscribers.filter(subscriber => !subscriber.is_guest && !subscriber.is_view_only)
+                                    .map(subscriber => subscriber.id);
 
                                 const withTimeout = (promise, timeout) => {
                                     return Promise.race([
