@@ -47,6 +47,10 @@ jobs:
 
       - name: Build
         run: |
+          sudo apt update -y 
+          sudo apt install -y openjdk-21-jdk-headless
+          javac --version
+          ./mvnw install
           ./mvnw package -pl onlyoffice-monday-gateway -am
           ./mvnw package -pl onlyoffice-monday-tenant -am
           ./mvnw package -pl onlyoffice-monday-user -am
