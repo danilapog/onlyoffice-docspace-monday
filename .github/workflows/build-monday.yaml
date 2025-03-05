@@ -62,6 +62,6 @@ jobs:
           ./mvnw -pl onlyoffice-monday-gateway jib:dockerBuild -Ddocker.image.name=${REPO}/monday-gateway:${TAG}
           ./mvnw -pl onlyoffice-monday-tenant jib:dockerBuild -Ddocker.image.name=${REPO}/monday-tenant:${TAG}
           ./mvnw -pl onlyoffice-monday-user jib:dockerBuild -Ddocker.image.name=${REPO}/monday-user:${TAG}
-          #docker push ${REPO}/monday-gateway:${TAG}
-          #docker push ${REPO}/monday-tenant:${TAG}
-          #docker push ${REPO}/monday-user:${TAG}
+          docker push ${REPO}/monday-gateway:${TAG}
+          docker push ${REPO}/monday-tenant:${TAG}
+          docker push ${REPO}/monday-user:${TAG}
