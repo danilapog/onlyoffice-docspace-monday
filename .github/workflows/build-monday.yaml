@@ -51,15 +51,17 @@ jobs:
       #    password: ${{ (inputs.repo == 'test') && secrets.DOCKER_TEST_ACCESS_TOKEN || secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
       - name: Build
+        env: 
+          REPO: ${{ (inputs.repo == 'test') && secrets.DOCKER_TEST_REGISTRY || 'docker.io' }}
+          TAG: ${{ github.event.inputs.tag }}
         run: |
           ./mvnw install
           ./mvnw package -pl onlyoffice-monday-gateway -am
           ./mvnw package -pl onlyoffice-monday-tenant -am
           ./mvnw package -pl onlyoffice-monday-user -am
-          ./mvnw -pl onlyoffice-monday-gateway jib:dockerBuild -Ddocker.image.name=docker.onlyoffice.com/monday-gateway:1.0.0-rc15
-          ./mvnw -pl onlyoffice-monday-tenant jib:dockerBuild -Ddocker.image.name=docker.onlyoffice.com/monday-tenant:1.0.0-rc15
-          ./mvnw -pl onlyoffice-monday-user jib:dockerBuild -Ddocker.image.name=docker.onlyoffice.com/monday-user:1.0.0-rc15
-          echo "PUSH IMAGE"
-          #docker push docker.onlyoffice.com/monday-gateway:1.0.0-rc15
-          #docker push docker.onlyoffice.com/monday-tenant:1.0.0-rc15
-          #docker push docker.onlyoffice.com/monday-user:1.0.0-rc15
+          ./mvnw -pl onlyoffice-monday-gateway jib:dockerBuild -Ddocker.image.name=${REPO}/monday-gateway:${TAG}
+          ./mvnw -pl onlyoffice-monday-tenant jib:dockerBuild -Ddocker.image.name=${REPO}/monday-tenant:${TAG}
+          ./mvnw -pl onlyoffice-monday-user jib:dockerBuild -Ddocker.image.name=${REPO}/monday-user:${TAG}
+          #docker push ${REPO}/monday-gateway:${TAG}
+          #docker push ${REPO}/monday-tenant:${TAG}
+          #docker push ${REPO}/monday-user:${TAG}
